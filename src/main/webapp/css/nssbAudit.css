@@ -1,0 +1,58 @@
+*{
+	margin: 0px;
+	padding: 0px;
+}
+
+html {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	height: 100%;
+	width: 100%;
+	font-family:monospace,monospace;
+    font-family:arial,Tahoma,"Microsoft YaHei";
+}
+
+.modal-body {
+	overflow: auto;
+}
+
+#cellModal_tz, #cellModal_sb {
+	height: 100%;
+	width: 100%;
+}
+
+.modal-content {
+	height: 100%;
+}
+
+#auditModal, #lookUpModal{
+	width: 100%;
+	height: 100%;
+}
+
+#audit-modal-dialog, #lookUp-modal-dialog, #hotTable_modal_dialog{
+	width: 90%;
+	height: 90%;
+	overflow:hidden;
+}
+
+.tz-modal-body{
+	overflow:hidden;
+}
+
+.second-modal-dialog-body{
+	overflow:auto !important;
+}
+
+#auditModal{
+	width: 100%;
+	height: 100%;
+}
+
+.third-modal-dialog-body{
+	width: 100%;
+	overflow:hidden;
+}

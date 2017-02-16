@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.handsonTableModel.dao.HandsonTableModelDao" >
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.handsonTableModel.model.HandsonTableModel" >
+    <result column="MODEL_ID" property="modelId" jdbcType="VARCHAR" />
+    <result column="TABLE_MODEL" property="tableModel" jdbcType="CLOB" 
+     javaType = "java.lang.String"  typeHandler ="com.aisino.nssb.utils.OracleClobTypeHandler"/>
+   
+    <result column="MODEL" property="model" jdbcType="VARCHAR" />  
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP"  property="updateDate" />
+    <result column="ADD_DATE"  jdbcType="TIMESTAMP" property="addDate" />
+    <result column="MODEL_NAME" property="modelName" jdbcType="VARCHAR" />
+    <result column="TZ_NSSB" property="tzNssb" jdbcType="VARCHAR" />  
+    <result column="ONE_MENUS" property="oneMenus" jdbcType="VARCHAR" />
+    <result column="TWO_MENUS" property="twoMenus" jdbcType="VARCHAR" />  
+    
+  </resultMap>
+ 
+  <insert id="insert" parameterType="com.aisino.nssb.core.handsonTableModel.model.HandsonTableModel" >
+    insert into HANDSON_TABLE_MODEL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="modelId != null" >
+        MODEL_ID,
+      </if>
+      <if test="tableModel != null" >
+        TABLE_MODEL,
+      </if>
+      <if test="model != null" >
+        MODEL,
+      </if>    
+      <if test="updateDate != null" >
+        UPDATE_DATE,
+      </if>
+       <if test="addDate != null" >
+        ADD_DATE,
+      </if>
+       <if test="modelName != null" >
+         MODEL_NAME,
+      </if>
+      <if test="tzNssb != null" >
+         TZ_NSSB,
+      </if>
+      <if test="oneMenus != null" >
+         ONE_MENUS,
+      </if>
+       <if test="twoMenus != null" >
+         TWO_MENUS,
+      </if>
+       
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="modelId != null" >
+        #{modelId,jdbcType=VARCHAR},
+      </if>
+      <if test="tableModel != null" >
+        #{tableModel,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null" >
+        #{model,jdbcType=VARCHAR},
+      </if>
+       <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      	</if>
+      	<if test="addDate != null" >
+        #{addDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modelName != null" >
+        #{modelName,jdbcType=VARCHAR},
+      </if>
+       <if test="tzNssb != null" >
+          #{tzNssb,jdbcType=VARCHAR},
+      </if>
+       <if test="oneMenus != null" >
+         #{oneMenus,jdbcType=VARCHAR},
+      </if>
+       <if test="twoMenus != null" >
+         #{twoMenus,jdbcType=VARCHAR},
+      </if>
+       
+    </trim>
+  </insert>
+  
+  
+  <delete id="delModel"  parameterType="com.aisino.nssb.core.handsonTableModel.model.HandsonTableModel">
+    update HANDSON_TABLE_MODEL
+    set MODEL=0
+    where MODEL_ID=#{modelId,jdbcType=VARCHAR}
+     and  TZ_NSSB=#{tzNssb,jdbcType=VARCHAR}
+  
+  </delete>
+  
+  <update id="updateModel" parameterType="com.aisino.nssb.core.handsonTableModel.model.HandsonTableModel">
+  
+   update HANDSON_TABLE_MODEL
+   <set>
+   		<if test="tableModel!=null">
+   		TABLE_MODEL=#{tableModel,jdbcType=VARCHAR}
+   		</if>
+   </set>
+  	 where MODEL_ID=#{modelId,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="LoadTable" resultType="java.lang.String"  parameterType="com.aisino.nssb.core.handsonTableModel.model.HandsonTableModel">
+    select TABLE_MODEL from  HANDSON_TABLE_MODEL 
+
+    where  MODEL=1  and MODEL_ID=#{modelId,jdbcType=VARCHAR}
+          and  TZ_NSSB=#{tzNssb,jdbcType=VARCHAR}
+   
+  </select>
+  
+   <select id="selectModelName" resultType="java.util.HashMap" parameterType="java.util.HashMap"> 
+   				
+    SELECT RN,MODEL_ID,MODEL_NAME,TZ_NSSB,ONE_MENUS,TWO_MENUS
+		FROM
+
+		(SELECT a.MODEL_ID,a.MODEL_NAME,a.TZ_NSSB,a.ONE_MENUS,a.TWO_MENUS,ROWNUM rn
+		FROM (SELECT MODEL_ID,MODEL_NAME,TZ_NSSB,ONE_MENUS,TWO_MENUS
+
+		FROM
+		HANDSON_TABLE_MODEL 
+		  <where>
+		  <if test="model != null" >
+        		MODEL=#{model,jdbcType=VARCHAR}
+ 		  </if>
+ 		   <if test="tzNssb != null" >
+        		and TZ_NSSB=#{tzNssb,jdbcType=VARCHAR}
+ 		  </if>
+ 		  </where>
+ 		  order by MODEL_ID asc
+ 		  )a
+		WHERE
+		#{end} >= ROWNUM )
+		WHERE rn >= #{start}
+   
+   </select>
+    <select id="selectModelNameCount" resultType="int" parameterType="java.util.HashMap"> 
+   				
+     SELECT  count(*)
+		FROM
+		HANDSON_TABLE_MODEL 
+		 <where>
+		  
+		  <if test="model != null" >
+        		MODEL=#{model,jdbcType=VARCHAR}
+ 		  </if>
+ 		   <if test="tzNssb != null" >
+        		and TZ_NSSB=#{tzNssb,jdbcType=VARCHAR}
+ 		  </if>
+ 		  </where>
+ 		  order by MODEL_ID asc
+   </select>
+   <select id="selectListHandson" resultMap="BaseResultMap"  parameterType="com.aisino.nssb.core.handsonTableModel.model.HandsonTableModel" >
+    	 select 
+     		MODEL_NAME as modelName,
+     		MODEL_ID  as   modelId,
+     		TABLE_MODEL as tableModel,
+     		TZ_NSSB as tzNssb
+     		from  HANDSON_TABLE_MODEL
+     		<where>
+		  
+		  		<if test="model != null" >
+        			MODEL=#{model,jdbcType=VARCHAR}
+ 		  		</if>
+ 		  		<if test="tzNssb != null" >
+        		    and TZ_NSSB=#{tzNssb,jdbcType=VARCHAR}
+ 		  		</if>
+ 		  		<if test="modelId != null" >
+        		    and MODEL_ID=#{modelId,jdbcType=VARCHAR}
+ 		  		</if>
+ 			</where>
+    </select>
+    
+     <select id="selectListHandsonOr" resultMap="BaseResultMap"  parameterType="com.aisino.nssb.core.handsonTableModel.model.HandsonTableModel" >
+    	 select 
+     		MODEL_NAME as modelName,
+     		MODEL_ID  as   modelId,
+     		TABLE_MODEL as tableModel,
+     		TZ_NSSB as tzNssb
+     		from (select * from  HANDSON_TABLE_MODEL  where   TZ_NSSB=1 or   TZ_NSSB=2)htm 
+     		 where  htm.MODEL=#{model,jdbcType=VARCHAR}
+    </select>
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aisino.nssb.core.handsonTable.dao.HandsonTableDao">
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.handsonTable.model.HandsonTable">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="TABLE_ID" jdbcType="VARCHAR" property="tableId" />
+    <result column="ROWX" jdbcType="DECIMAL" property="rowX" />
+    <result column="ROW_DATA" jdbcType="VARCHAR" property="rowData" />
+    <result column="COL" jdbcType="DECIMAL" property="col" />
+     <result column="HANDSON_ID" property="handsonId" jdbcType="VARCHAR" />
+     <result column="NSRSBH_ID" property="nsrsbhId" jdbcType="VARCHAR" />
+     <result column="TAXDATEID" property="taxDateId" jdbcType="DECIMAL" />
+  </resultMap>
+  <insert id="insert" parameterType="com.aisino.nssb.core.handsonTable.model.HandsonTable">
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select seq_handson_id.nextval from dual
+    </selectKey>
+    insert into HANDSON_TABLE (ID, TABLE_ID, ROWX, 
+      ROW_DATA, COL,HANDSON_ID,NSRSBH_ID,TAXDATEID)
+    values (#{id,jdbcType=VARCHAR}, #{tableId,jdbcType=VARCHAR}, #{rowX,jdbcType=DECIMAL}, 
+      #{rowData,jdbcType=VARCHAR}, #{col,jdbcType=DECIMAL}, #{handsonId,jdbcType=VARCHAR},
+      #{nsrsbhId,jdbcType=VARCHAR},#{taxDateId,jdbcType=DECIMAL})
+  </insert>
+   <select id="LoadHdTable"  resultType="java.util.HashMap"  parameterType="com.aisino.nssb.core.handsonTable.model.HandsonTable">
+  	select  ROWX, COL,ROW_DATA,NSRSBH_ID,TAXDATEID,HANDSON_ID from HANDSON_TABLE 
+  	where TABLE_ID=#{tableId,jdbcType=VARCHAR}
+  			<if test="handsonId !=null">
+  				and HANDSON_ID=#{handsonId,jdbcType=VARCHAR} 
+  			</if>
+  			<if test="taxDateId !=null and taxDateId !=0">
+  				and TAXDATEID=#{taxDateId,jdbcType=DECIMAL}
+  			</if>
+  			<if test="nsrsbhId !=null">
+  			    and NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}
+  			</if>
+			
+  </select>
+  <insert id="insertList" parameterType="java.util.List">
+   insert into HANDSON_TABLE (ID,TABLE_ID, ROWX, 
+      ROW_DATA, COL,HANDSON_ID,NSRSBH_ID,TAXDATEID)
+      select SEQ_HANDSON_ID.nextval,cd.* from(
+	 <foreach collection="list" index="" item="handsonTable"
+		 separator="union all">
+ 	select
+       #{handsonTable.tableId,jdbcType=VARCHAR},
+       #{handsonTable.rowX,jdbcType=DECIMAL},   
+       #{handsonTable.rowData,jdbcType=VARCHAR},    
+       #{handsonTable.col,jdbcType=DECIMAL},
+       #{handsonTable.handsonId,jdbcType=VARCHAR},
+       #{handsonTable.nsrsbhId,jdbcType=VARCHAR},
+       #{handsonTable.taxDateId,jdbcType=DECIMAL}
+ 	from dual
+
+ 	</foreach>
+ 	)cd
+  </insert>
+  <delete id="delTable" parameterType="java.lang.String"> 
+  	delete from  HANDSON_TABLE 
+  	where TABLE_ID=#{tableId,jdbcType=VARCHAR}    
+  </delete>
+  
+  <delete id="delByHandsonId"  parameterType="com.aisino.nssb.core.handsonTable.model.HandsonTable">
+  	delete from  HANDSON_TABLE 
+  	where HANDSON_ID=#{handsonId,jdbcType=VARCHAR} and TABLE_ID=#{tableId,jdbcType=VARCHAR}    
+  </delete>
+   <delete id="deleteByHandsonIdList" parameterType="java.util.List">  
+        delete from HANDSON_TABLE where HANDSON_ID in  
+        <foreach collection="map.list" index="index" item="item" open="(" close=")" separator=",">  
+            #{item}  
+        </foreach>  
+    </delete>  
+    
+    
+</mapper>

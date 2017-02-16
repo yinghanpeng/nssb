@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aisino.nssb.core.job.dao.UserSynDao">
+	<!-- 同步用户数据 -->
+	<!--
+		<insert id="AddUser" statementType="CALLABLE"> begin delete from nssb_js_test; delete from nssb_yh_test; delete from nssb_yh_js_test; delete from
+		nssb_jg_test; Insert into nssb_yh_test(YHID,yhmc,password,qx_bmid) select YHID,password,yhmc,qx_bmid from xtgl_yh where yxbz='1' and sdbj='0'; Insert into
+		nssb_js_test(jsID,jsmc,bmid) select jsID,jsmc,bmid from xtgl_js where jszt='0'; Insert into nssb_yh_js_test(yhid,jsid) select yhid,jsid from xtgl_yh_js;
+		Insert into nssb_jg_test(id,bmid,bmmc,bmjc,sjbmid,nsrsbh,ssnsrsbh,sbbz) select id,bmid,bmmc,bmjc,sjbmid,nsrsbh,ssnsrsbh,sbbz from xtgl_bm where yxbz='1'; end;
+		</insert>
+	-->
+	<insert id="addUser" statementType="CALLABLE">
+		{CALL SP_AISINO_LOAD}
+	</insert>
+</mapper>
+

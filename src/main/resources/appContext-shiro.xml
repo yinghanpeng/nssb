@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="  
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<description>apache shiro配置</description>
+	<!-- 1. Shiro生命周期处理器 默认配置 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- 2. 配置securityManager -->
+	<!-- 2.1. 配置Realm -->
+	<bean id="nssbRealm" class="com.aisino.nssb.core.shiro.LoginRealm" >
+	<property name="authorizationCachingEnabled" value="false"/>
+	</bean>
+	<!-- 2.2. 配置cacheManager 这里采用ehCache缓存--><!--
+	<bean id="cacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager" />
+
+	--><!--<bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManager" ref="ehCacheManager" />
+	</bean>
+	-->
+	<!--
+		2.3. 配置securityManager
+	-->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!--<property name="cacheManager" ref="cacheManager" />
+		-->
+		<property name="sessionMode" value="native" />
+		<property name="realm" ref="nssbRealm" />
+	</bean>
+
+	<!-- 3. 配置Filter -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/pages/404.jsp" />
+		<property name="successUrl" value="/" />
+		<property name="unauthorizedUrl" value="/pages/404.jsp" />
+		<property name="filterChainDefinitions">
+			<value>
+				/login.do = anon
+				/nssbManager/login.do = anon
+				/nssbAudit/login.do = anon
+				/nssbKmye/login.do = anon
+				/nssbSsfl/login.do = anon
+				/404.jsp = anon
+            </value>
+		</property>
+	</bean>
+</beans> 

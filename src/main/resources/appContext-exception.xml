@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="  
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+
+		<!-- 定义需要特殊处理的异常，用类名或完全路径名作为key，异常页面名作为值 -->
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.apache.shiro.authc.AuthenticationException">/404</prop>
+			</props>
+		</property>
+	</bean>
+</beans> 

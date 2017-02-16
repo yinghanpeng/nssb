@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aisino.nssb.core.jxrz.dao.JxrzDao">
+	<sql id="getJg">
+		--机构查询
+		<if test='sbbz=="1"'>
+			(select nsrsbh, bmid, bmmc
+			from (select nsrsbh, bmid, bmmc, sbbz
+			from (select nsrsbh, m.bmid, m.bmmc, m.sbbz, m.sjbmid
+			from XTGL_BM m
+			start with
+			m.BMID = #{bmid}
+			connect by m.sjbmid = PRIOR m.BMID)
+			where (sbbz = '2' or BMID = #{bmid})
+			and nsrsbh is not null) f
+			where f.bmid not in
+			(
+			select bm.bmid
+			from
+			xtgl_bm bm,
+			(
+			select
+			nsrsbh, bmid, bmmc, sbbz
+			from (
+			select nsrsbh, m.bmid, m.bmmc, m.sbbz, m.sjbmid
+			from XTGL_BM m
+			start with m.BMID = #{bmid}
+			connect by m.sjbmid =
+			PRIOR m.BMID)
+			where sbbz = '1'
+			and bmid != #{bmid}
+			and nsrsbh is not null) t
+			start with bm.bmid = t.bmid
+			connect by bm.sjbmid = PRIOR bm.BMID)) sh
+	</if>
+		<if test='sbbz=="0"'>
+			(select nsrsbh, bmid, bmmc
+			from
+			xtgl_bm where
+			bmid = #{bmid}
+			and nsrsbh is not null) sh
+	</if>
+	</sql>
+	<select id="getJeSeJxp" resultType="java.util.HashMap" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		--进项发票数据
+		select
+		nvl(sum(fp.fpje),0) as je ,nvl(sum(fp.fpse),0) as se, count(*) as fs
+		from VIMS_BIZ_INVOICE fp,
+		<include refid="getJg" />
+		where rzsj between
+		to_date(#{begindate},'YYYY-MM-DD') and
+		to_date(#{enddate},'YYYY-MM-DD')
+		and fp.GFSH = sh.nsrsbh
+		<if test=' rzjg != null and rzjg != "" '>
+			and fp.RZJG=#{rzjg}
+		</if>
+		<if test=' dkzt != null and dkzt != "" '>
+			and fp.DKZT=#{dkzt}
+		</if>
+		<if test=' gdzcbs != null and gdzcbs != "" '>
+			and fp.gdzcbz=#{gdzcbs}
+		</if>
+		<if test=' zcbs != null and zcbs != "" '>
+			and fp.zcbs=#{zcbs}
+		</if>
+		<if test=' fpyt != null and fpyt != "" '>
+			and fp.fpyt=#{fpyt}
+		</if>
+	</select>
+
+	<select id="getKkpz" resultType="java.util.HashMap" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		--扣款凭证取数
+		select nvl(sum(fpje),0) je,nvl(sum(fpse),0) se,count(*) fs,fplb,fplbmc
+		from
+		(
+		select
+		fp.fpje,fp.fpse,fp.fplb,fp.gfsh,sh.nsrsbh ,sh.bmid,sh.bmmc,(case
+		fp.fplb when '1'
+		then '农产品收购发票或者销售发票' when '2' then '代扣代缴税收缴款凭证' when '3' then '海关进口增值税专用缴款书' when '4' then '其他小票' ELSE '其他' END)
+		fplbmc
+		from VIMS_SXP fp,
+		<include refid="getJg" />
+		where lrrq between to_date(#{begindate},'YYYY-MM-DD') and
+		to_date(#{enddate},'YYYY-MM-DD')
+		and fp.GFSH = sh.nsrsbh
+		<if test=' dkzt != null and dkzt != "" '>
+			and fp.DKZT=#{dkzt}
+		</if>
+		<if test=' fplb != null and fplb != "" '>
+			and fp.fplb=#{fplb}
+		</if>
+		)
+		group by fplb,fplbmc
+		order by fplb
+	</select>
+
+	<select id="getHzfpSe" resultType="String" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		--作为购方的红字发票
+		select nvl(sum(fp.hjse),0) hjse
+		from HPGL_ZPREDINVREQINFO fp,
+		<include refid="getJg" />
+		where fp.tkrq between to_date(#{begindate}, 'YYYY-MM-DD') and
+		to_date(#{enddate}, 'YYYY-MM-DD')
+		and fp.GFSH = sh.nsrsbh
+	</select>
+
+	<select id="getBdcSe" resultType="String" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		--不动产税额
+		select nvl(sum(case
+		when bdc.dksj1 between to_date(#{begindate}, 'YYYY-MM-DD') and
+		to_date(#{enddate}, 'YYYY-MM-DD') then
+		bdc.fpse * 0.6
+		when bdc.dksj2
+		between
+		to_date(#{begindate}, 'YYYY-MM-DD') and
+		to_date(#{enddate}, 'YYYY-MM-DD') then
+		bdc.fpse * 0.4
+		else
+		0
+		end),0) as se
+		from (select fp.fpse, fp.dkzt, fp.dksj1,
+		fp.dksj2
+		from VIMS_BIZ_INVOICE fp,
+		<include refid="getJg" />
+		where (fp.dksj1 between to_date(#{begindate}, 'YYYY-MM-DD') and
+		to_date(#{enddate}, 'YYYY-MM-DD') or
+		fp.dksj2 between to_date(#{begindate}, 'YYYY-MM-DD') and
+		to_date(#{enddate}, 'YYYY-MM-DD'))
+		and fp.GFSH = sh.nsrsbh
+		and fp.rzjg = 0
+		and fp.fplb = 0
+		and fp.gdzcbz = 'Y'
+		and (fp.zcbs = 3 or fp.zcbs = 2 )
+		) bdc
+	</select>
+	<select id="getGdzcSe" resultType="String" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		--固定资产(不包括不动产)税额
+		select nvl(sum(fpse),0) as se
+		from VIMS_BIZ_INVOICE fp,
+		<include refid="getJg" />
+		where rzsj between to_date(#{begindate},'YYYY-MM-DD') and
+		to_date(#{enddate},'YYYY-MM-DD')
+		and fp.GFSH = sh.nsrsbh
+		and fp.rzjg = 0
+		and fp.fplb = 0
+		and fp.gdzcbz =
+		'Y'
+		and fp.ZCBS != 3
+	</select>
+	<select id="getGdzcSe1" resultType="String" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		--固定资产(不包括不动产)税额,第一期之前的
+		select nvl(sum(fpse),0) as se
+		from VIMS_BIZ_INVOICE fp,
+		<include refid="getJg" />
+		where rzsj <![CDATA[<]]> to_date(#{begindate},'YYYY-MM-DD')
+		and fp.GFSH = sh.nsrsbh
+		and fp.rzjg = 0
+		and fp.fplb = 0
+		and fp.gdzcbz =
+		'Y'
+		and fp.ZCBS != 3
+	</select>
+	<select id="getJxpMx" resultType="java.util.HashMap" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		select fp.pzh,
+		case fp.zcbs when 2 then '在建工程' when 3 then '不动产' end xmlx
+		,
+		case fp.fpyt
+		when '1' then
+		'用于简易计税方法计税项目'
+		when '2' then
+		'用于免征或不征增值税项目'
+		when '3' then
+		'用于集体福利、个人消费'
+		when '4' then
+		'非正常损失'
+		when '5' then
+		'购进的旅客运输服务、贷款服务、餐饮服务、居民日常、娱乐服务等'
+		when '6' then
+		'用于视同销售项目,全部'
+		when '7' then
+		'用于不可抵扣用途'
+		when '8' then
+		'用于不可抵扣用途'
+		end
+		xmyt,
+		fp.xfsh,
+		fp.fpdm,
+		fp.fphm,
+		ROUND(fp.fpje, 2) je,
+		ROUND(fp.fpse, 2) se
+		from VIMS_BIZ_INVOICE fp,
+		<include refid="getJg" />
+		where rzsj between to_date(#{begindate},'YYYY-MM-DD') and
+		to_date(#{enddate},'YYYY-MM-DD')
+		and fp.GFSH = sh.nsrsbh
+		and fp.RZJG=0
+		and fp.gdzcbz='Y'
+		and (fp.zcbs = 3
+		or fp.zcbs = 2 )
+	</select>
+
+	<select id="getBdc" resultType="java.util.HashMap" parameterType="com.aisino.nssb.core.bean.JxrzBean">
+		--不动产金额税额份数
+		select nvl(sum(fp.fpje),0) je,nvl(sum(fp.fpse),0) se ,count(*) fs
+		from VIMS_BIZ_INVOICE fp,
+		<include refid="getJg" />
+		where (fp.dksj1 between to_date(#{begindate}, 'YYYY-MM-DD') and
+		to_date(#{enddate}, 'YYYY-MM-DD') or
+		fp.dksj2 between to_date(#{begindate}, 'YYYY-MM-DD') and
+		to_date(#{enddate}, 'YYYY-MM-DD'))
+		and fp.GFSH = sh.nsrsbh
+		and fp.rzjg = 0
+		and fp.fplb = 0
+		and fp.gdzcbz = 'Y'
+		and (fp.zcbs = 3 or fp.zcbs = 2 )
+	</select>
+</mapper>

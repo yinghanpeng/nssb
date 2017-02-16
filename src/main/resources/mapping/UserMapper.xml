@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.user.dao.UserDao" >
+  
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.user.model.User" >
+    <id column="YHID" property="yhid" jdbcType="VARCHAR" />
+    <result column="YHMC" property="yhmc" jdbcType="VARCHAR" />
+    <result column="PASSWORD" property="password" jdbcType="VARCHAR" />
+    <result column="CZRYID" property="czryid" jdbcType="VARCHAR" />
+    <result column="QX_BMID" property="qxBmid" jdbcType="VARCHAR" />
+    <result column="LRRQ" property="lrrq" jdbcType="TIMESTAMP" />
+    <result column="LRRYID" property="lrryid" jdbcType="VARCHAR" />
+    <result column="LRRYMC" property="lrrymc" jdbcType="VARCHAR" />
+    <result column="LRYHID" property="lryhid" jdbcType="VARCHAR" />
+    <result column="BY1" property="by1" jdbcType="VARCHAR" />
+    <result column="BY2" property="by2" jdbcType="VARCHAR" />
+    <result column="SDBJ" property="sdbj" jdbcType="VARCHAR" />
+    <result column="USRTOKEN" property="usrtoken" jdbcType="VARCHAR" />
+    <result column="XGRQ" property="xgrq" jdbcType="TIMESTAMP" />
+    <result column="YHSX" property="yhsx" jdbcType="VARCHAR" />
+    <result column="YXBZ" property="yxbz" jdbcType="VARCHAR" />
+    <result column="ZJHM" property="zjhm" jdbcType="VARCHAR" />
+    <result column="DH" property="dh" jdbcType="VARCHAR" />
+    <result column="DZYX" property="dzyx" jdbcType="VARCHAR" />
+    <result column="SDXGBZ" property="sdxgbz" jdbcType="VARCHAR" />
+    <result column="BMMC" property="bmmc" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  
+  
+  <select id="findByName"  resultMap="BaseResultMap"  parameterType="java.lang.String" >
+	  select  yh.*,(select BMMC from XTGL_BM bm where yh.qx_bmid=bm.bmid )bmmc from XTGL_YH  yh 
+	  where   yh.SDBJ = '0' and  yh.YXBZ = '1' and yh.YHID = #{yhid,jdbcType=VARCHAR}
+	</select>
+	
+	
+	<select id="selectAwftByName" resultType="java.util.Map"  parameterType="com.aisino.nssb.core.user.model.User">	
+			select t.yhmc, t.yhid,x.nsrsbh,x.nsrmc,t.qx_bmid,m.sbbz from 
+				XTGL_YH t,XTGL_BM m,xtgl_xfxx x
+				where t.qx_bmid = m.bmid and m.nsrsbh = x.nsrsbh and t.yhid =  #{yhid,jdbcType=VARCHAR}
+
+	</select>  
+	
+	<select id="selectNsbankByName"  resultType="java.lang.String"  parameterType="com.aisino.nssb.core.user.model.User"> 
+		
+		select m.bmmc from XTGL_BM m start with m.bmid = (select t.qx_bmid from XTGL_YH t where t.yhid = #{yhid,jdbcType=VARCHAR})
+			connect by prior m.sjbmid = m.bmid 
+	
+	
+	</select>
+	
+	<select id="selectAuditByName" resultType="java.util.Map"  parameterType="com.aisino.nssb.core.user.model.User">
+			select m.BMID meId , m.BMMC names  ,m.SJBMID sjId  from XTGL_BM m start with m.bmid = 
+			(select t.qx_bmid from XTGL_YH t where t.yhid = #{yhid,jdbcType=VARCHAR})
+           connect by prior m.sjbmid = m.bmid
+			
+	</select>
+	<select id="selectNsBankByName" resultType="java.util.Map"  parameterType="com.aisino.nssb.core.user.model.User">
+			select m.BMID meId , m.BMMC names  ,m.SJBMID sjId  from XTGL_BM m  where  m.sbbz !='2'   start with m.bmid = 
+			(select t.qx_bmid from XTGL_YH t where t.yhid = #{yhid,jdbcType=VARCHAR})
+           connect by m.sjbmid = PRIOR m.BMID
+
+			
+	</select>
+	
+  
+</mapper>

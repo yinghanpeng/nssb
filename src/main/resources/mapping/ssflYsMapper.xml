@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.SsflYs.dao.SsflYsDao" >
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.SsflYs.model.SsflYs" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="SPMC" property="spmc" jdbcType="VARCHAR" />
+    <result column="SSFLBM" property="ssflbm" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, SPMC, SSFLBM
+  </sql>
+  
+  <select id="querySsflByPage" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+  	SELECT RN,b.SPMC,b.SSFLMC,b.ID 
+		FROM
+		(SELECT a.*, ROWNUM rn
+		FROM (SELECT SPMC,SSFLMC,ID
+		FROM
+		NSSB_SSFL_YS  join NSSB_SSFL_BM on NSSB_SSFL_YS.SSFLBM=NSSB_SSFL_BM.SSFLBM
+		<where>
+				<if test=" spmc !=null and spmc !='' ">
+				  	SPMC = #{spmc}      
+        		</if>
+        		<if test="ssflmc !=null and ssflmc !=''">
+        		 and SSFLMC=#{ssflmc}
+        		</if>
+		
+		</where>
+  		) a
+		WHERE
+		#{end} >= ROWNUM )b
+		WHERE rn >= #{start}
+  
+  
+  </select>
+  <select id="querySsflCount" resultType="int" parameterType="java.util.HashMap">
+  		SELECT count(*) FROM NSSB_SSFL_YS join NSSB_SSFL_BM on NSSB_SSFL_YS.SSFLBM=NSSB_SSFL_BM.SSFLBM
+  				<where>
+				<if test=" spmc !=null and spmc !='' ">
+				  	SPMC = #{spmc}      
+        		</if>
+        		<if test="ssflmc !=null and ssflmc !=''">
+        		 and SSFLMC=#{ssflmc}
+        		</if>
+		
+		</where>
+  
+  
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from NSSB_SSFL_YS
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from NSSB_SSFL_YS
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteSsflById"  parameterType="map"  >
+    delete from NSSB_SSFL_YS
+    where SPMC in 
+    <foreach item="spmc" index="index" collection="map.list" open="(" separator="," close=")">
+			#{spmc}
+	</foreach>
+    
+  </delete>
+  
+  <insert id="insert" parameterType="com.aisino.nssb.core.SsflYs.model.SsflYs" >
+    insert into NSSB_SSFL_YS (ID, SPMC, SSFLBM
+      )
+    values (#{id,jdbcType=VARCHAR}, #{spmc,jdbcType=VARCHAR}, #{ssflbm,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.aisino.nssb.core.SsflYs.model.SsflYs" >
+        insert into NSSB_SSFL_YS
+			values (Ssfl.nextval,#{spmc,jdbcType=VARCHAR},
+			 (select ssflbm from NSSB_SSFL_BM where ssflmc=#{ssflbm,jdbcType=VARCHAR}))
+     
+  </insert>
+  
+  <!-- 更新 -->
+   <update id="updateSsflYs" parameterType="java.util.HashMap" >
+    update NSSB_SSFL_YS
+    <set >
+
+      <if test="spmc != null" >
+        SPMC = #{spmc,jdbcType=VARCHAR},
+      </if>
+      <if test="ssflbm != null" >
+        SSFLBM = (select SSFLBM from NSSB_SSFL_BM where SSFLMC = #{ssflbm,jdbcType=VARCHAR}),
+      </if>
+    </set>
+    where ID = #{spmcId,jdbcType=VARCHAR} 
+  </update>
+  
+  
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.aisino.nssb.core.SsflYs.model.SsflYs" >
+    update NSSB_SSFL_YS
+    <set >
+      <if test="spmc != null" >
+        SPMC = #{spmc,jdbcType=VARCHAR},
+      </if>
+      <if test="ssflbm != null" >
+        SSFLBM = #{ssflbm,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aisino.nssb.core.SsflYs.model.SsflYs" >
+    update NSSB_SSFL_YS
+    set SPMC = #{spmc,jdbcType=VARCHAR},
+      SSFLBM = #{ssflbm,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="getAllBySpmc" resultMap="BaseResultMap" parameterType="java.lang.String">
+  		 select 
+    <include refid="Base_Column_List" />
+    from NSSB_SSFL_YS
+    where SPMC = #{spmc,jdbcType=VARCHAR}
+  
+  
+  </select>
+</mapper>

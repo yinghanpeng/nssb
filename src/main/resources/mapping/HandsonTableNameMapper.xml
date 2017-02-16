@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.handsonTableName.dao.HandsonTableNameDao" >
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.handsonTableName.model.HandsonTableName" >
+    <result column="TABLE_ID" property="tableId" jdbcType="VARCHAR" />
+    <result column="TABLE_NAME" property="tableName" jdbcType="VARCHAR" />
+   
+     <result column="NAME_ID" jdbcType="VARCHAR" property="nameId" />
+    <result column="TABLE_AUDIT" jdbcType="VARCHAR" property="tableAudit" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="ADD_DATE" jdbcType="TIMESTAMP" property="addDate" />
+  </resultMap>
+  <insert id="insertSelective" parameterType="com.aisino.nssb.core.handsonTableName.model.HandsonTableName" >
+   
+    insert into HANDSON_TABLE_NAME (TABLE_ID, TABLE_NAME,MODEL_ID)
+    values (#{tableId,jdbcType=VARCHAR}, #{tableName,jdbcType=VARCHAR}, #{modelId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insert" parameterType="com.aisino.nssb.core.handsonTableName.model.HandsonTableName" >
+    insert into HANDSON_TABLE_NAME
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="tableId != null" >
+        TABLE_ID,
+      </if>
+      <if test="tableName != null" >
+        TABLE_NAME,
+      </if>
+       <if test="nameId != null">
+        NAME_ID,
+      </if>
+      <if test="tableAudit != null">
+        TABLE_AUDIT,
+      </if>
+      <if test="updateDate != null">
+        UPDATE_DATE,
+      </if>
+      <if test="addDate != null">
+        ADD_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="tableId != null" >
+        #{tableId,jdbcType=VARCHAR},
+      </if>
+      <if test="tableName != null" >
+        #{tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="nameId != null">
+        #{nameId,jdbcType=VARCHAR},
+      </if>
+      <if test="tableAudit != null">
+        #{tableAudit,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="addDate != null">
+        #{addDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <delete id="delTableName" parameterType="java.lang.String">
+    update HANDSON_TABLE_NAME
+     set NAME_ID=0
+  	 where TABLE_ID=#{tableId,jdbcType=VARCHAR}
+  </delete>
+  
+   <update id="updateTableName" parameterType="java.lang.String">
+  
+   update HANDSON_TABLE_NAME
+   <set>
+   		<if test="tableName!=null">
+   		TABLE_MODEL=#{tableName,jdbcType=VARCHAR}
+   		</if>
+   </set>
+  	 where TABLE_ID=#{tableId,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="selectTableName" resultType="java.util.HashMap" >
+  	 select * from HANDSON_TABLE_NAME
+  	 where NAME_ID=1
+   
+  </select>
+  
+  
+</mapper>

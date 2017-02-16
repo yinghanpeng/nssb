@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.apfile.dao.NssbApplyFileDao" >
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.apfile.model.NssbApplyFile" >
+    <result column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="APPLY_ID" property="applyId" jdbcType="VARCHAR" />
+    <result column="FILE_NAME" property="fileName" jdbcType="VARCHAR" />
+    <result column="FILE_PTAH" property="filePtah" jdbcType="VARCHAR" />
+    <result column="UPLOAD_DATE" property="uploadDate" jdbcType="TIMESTAMP" />
+    <result column="ROW_ID" property="rowId" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.aisino.nssb.core.apfile.model.NssbApplyFile" >
+     <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select NSSB_APPLY_FILE_ID.nextval from dual
+     </selectKey>
+    insert into NSSB_APPLY_FILE (ID, APPLY_ID, FILE_NAME, 
+      FILE_PTAH, UPLOAD_DATE, ROW_ID
+      )
+    values (#{id,jdbcType=VARCHAR}, #{applyId,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, 
+      #{filePtah,jdbcType=VARCHAR}, #{uploadDate,jdbcType=TIMESTAMP}, #{rowId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.aisino.nssb.core.apfile.model.NssbApplyFile" >
+   	 <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select NSSB_APPLY_FILE_ID.nextval from dual
+     </selectKey>
+    insert into NSSB_APPLY_FILE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+     
+        ID,
+      
+      <if test="applyId != null" >
+        APPLY_ID,
+      </if>
+      <if test="fileName != null" >
+        FILE_NAME,
+      </if>
+      <if test="filePtah != null" >
+        FILE_PTAH,
+      </if>
+      <if test="uploadDate != null" >
+        UPLOAD_DATE,
+      </if>
+      <if test="rowId != null" >
+        ROW_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >   
+        #{id,jdbcType=VARCHAR},
+      <if test="applyId != null" >
+        #{applyId,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="filePtah != null" >
+        #{filePtah,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadDate != null" >
+        #{uploadDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rowId != null" >
+        #{rowId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="queryApFileByPage"  resultType="java.util.HashMap" parameterType="java.util.HashMap">
+  			 SELECT RN,ID,APPLY_ID, FILE_NAME, 
+      FILE_PTAH, to_char(UPLOAD_DATE,'YYYY-MM-DD') as UPLOAD_DATE, ROW_ID
+		FROM
+
+		(SELECT a.*,ROWNUM rn
+		FROM (SELECT *
+
+		FROM
+		NSSB_APPLY_FILE 
+			<where>
+				<if test="applyId !=null">
+					APPLY_ID=#{applyId,jdbcType=VARCHAR}
+				</if>
+				<if test="rowId !=null">
+				 and ROW_ID=#{rowId,jdbcType=VARCHAR}
+				</if>
+			</where>
+		 
+ 		  order by UPLOAD_DATE asc
+ 		  )a
+		WHERE
+		#{end} >= ROWNUM )
+		WHERE rn >= #{start}
+   
+  </select>
+  <select id="queryApFileCount" resultType="int" parameterType="java.util.HashMap">
+  		   SELECT  count(*)
+		FROM NSSB_APPLY_FILE    
+		<where>
+				<if test="applyId !=null">
+					APPLY_ID=#{applyId,jdbcType=VARCHAR}
+				</if>
+				<if test="rowId !=null">
+				 and ROW_ID=#{rowId,jdbcType=VARCHAR}
+				</if>
+			</where>
+  </select>
+  
+  
+  <insert id="insertList"  parameterType="java.util.List">
+  	 insert into NSSB_APPLY_FILE (ID, APPLY_ID, FILE_NAME, 
+      FILE_PTAH, UPLOAD_DATE, ROW_ID
+      )
+      select NSSB_APPLY_FILE_ID.nextval,cd.*from(
+      <foreach collection="list" index="" item="nssbApplyFile"
+		 separator="union all">
+		 
+		 select
+       #{nssbApplyFile.applyId,jdbcType=VARCHAR},
+       #{nssbApplyFile.fileName,jdbcType=VARCHAR},
+       #{nssbApplyFile.filePtah,jdbcType=VARCHAR},
+       #{nssbApplyFile.uploadDate,jdbcType=TIMESTAMP},
+       #{nssbApplyFile.rowId,jdbcType=VARCHAR}      
+       	from dual
+  	</foreach>
+  	)cd
+  </insert>
+  
+  
+  <delete id="deleteApFileById" parameterType="map">
+     delete  from NSSB_APPLY_FILE
+     where ID  in
+  	<foreach item="id" index="index" collection="map.list" open="(" separator="," close=")">
+			#{id}
+	</foreach>
+  </delete>
+  <select id="queryFileById"  resultType="java.lang.String" parameterType="map">
+      select FILE_NAME from NSSB_APPLY_FILE 
+      where  ID in
+  		<foreach item="id" index="index" collection="map.list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+  </select> 
+   <select id="queryFileLoadById"  resultType="java.lang.String" parameterType="java.lang.String">
+      select FILE_NAME from NSSB_APPLY_FILE 
+      where  ID=#{id,jdbcType=VARCHAR} 
+  		
+  </select> 
+  <select id="SelectDelByRowId" resultMap="BaseResultMap" parameterType="com.aisino.nssb.core.apfile.model.NssbApplyFile" >
+  		  select * from NSSB_APPLY_FILE 
+      where  APPLY_ID=#{applyId,jdbcType=VARCHAR} 
+       and ROW_ID=#{rowId,jdbcType=VARCHAR}
+  
+  </select>
+  <delete id="deleteByFile" parameterType="com.aisino.nssb.core.apfile.model.NssbApplyFile" >
+  	delete  from NSSB_APPLY_FILE
+     where APPLY_ID=#{applyId,jdbcType=VARCHAR} 
+       and ROW_ID=#{rowId,jdbcType=VARCHAR}  
+  </delete>
+</mapper>

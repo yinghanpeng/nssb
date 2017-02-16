@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.afwthdm.dao.NssbAfwtHandsonModelDao" >
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.afwthdm.model.NssbAfwtHandsonModel" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="MODEL" property="model" jdbcType="VARCHAR" />
+    <result column="TEMP_BANK" property="tempBank" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, MODEL, TEMP_BANK
+  </sql>
+
+  <insert id="insert" parameterType="com.aisino.nssb.core.afwthdm.model.NssbAfwtHandsonModel" >
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select SEQ_NSSB_AFWT_HAND_MODEL.nextval from dual
+     </selectKey>
+   
+    insert into NSSB_AFWT_HANDSON_MODEL (ID, MODEL, TEMP_BANK
+      )
+    values (#{id,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, #{tempBank,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.aisino.nssb.core.afwthdm.model.NssbAfwtHandsonModel" >
+    
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select SEQ_NSSB_AFWT_HAND_MODEL.nextval from dual
+     </selectKey>
+   
+    insert into NSSB_AFWT_HANDSON_MODEL
+    <trim prefix="(" suffix=")" suffixOverrides="," >      
+        ID,      
+      <if test="model != null" >
+        MODEL,
+      </if>
+      <if test="applyId != null" >
+        TEMP_BANK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+    
+        #{id,jdbcType=VARCHAR},
+     
+      <if test="model != null" >
+        #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="tempBank != null" >
+        #{tempBank,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <delete id="delBymodel"  parameterType="java.lang.String">
+     delete from  NSSB_AFWT_HANDSON_MODEL
+     where  MODEL=#{model,jdbcType=VARCHAR}
+  
+  </delete>
+  <insert id="insertListTemp" parameterType="java.util.List">
+  		  insert  into NSSB_AFWT_HANDSON_MODEL(ID,MODEL,TEMP_BANK)
+	  select SEQ_NSSB_AFWT_HAND_MODEL.nextval,cd.*from(
+	 <foreach collection="list" index="" item="item"
+		 separator="union all">
+ 	select
+       #{item.model,jdbcType=VARCHAR},
+     
+       #{item.tempBank,jdbcType=VARCHAR}
+	from dual
+
+ 	</foreach>
+ 	)cd
+	</insert>
+  
+  
+  
+</mapper>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aisino.nssb.core.hxkmye.dao.hxkmyeDao">
+
+	<resultMap id="hxkmye" type="com.aisino.nssb.core.hxkmye.model.hxkmye">
+		<result column="GL_ORG_ID" property="glOrgId" jdbcType="VARCHAR" />
+		<result column="DTL_ACT_ORG_ID" property="dtlActOrgId" jdbcType="VARCHAR" />
+		<result column="ACT_ITM_ID" property="actItmId" jdbcType="VARCHAR" />
+		<result column="CCY_CD" property="ccyCd" jdbcType="VARCHAR" />
+		<result column="BAL" property="bal" jdbcType="DECIMAL" />
+		<result column="DBT_AMT" property="dbtAmt" jdbcType="DECIMAL" />
+		<result column="CRD_AMT" property="crdAmt" jdbcType="DECIMAL" />
+		<!-- 
+		<result column="PST_DT" property="pstDt" jdbcType="TIMESTAMP" />
+		<result column="DATA_DT" property="dataDt" jdbcType="TIMESTAMP" />
+		-->
+		
+	</resultMap>
+	<!-- 查询某一天某个机构的某个科目的余额 -->
+	<select id="getHxkmyeOneDay" resultMap="hxkmye" parameterType="java.util.HashMap">
+		select * from ETL_NSSB_HXKMYE b where b.DTL_ACT_ORG_ID = #{hxjg} and
+		trim(b.ACT_ITM_ID) =
+		#{km} and b.DATA_DT = #{sjrq}
+	</select>
+	<!-- 查询某一天某个一事通机构的所有(包括自己)核心子机构某个科目的余额 汇总-->
+	<select id="getAllHxkmyeOneDay" resultType="BigDecimal" parameterType="java.util.HashMap">
+		select
+		nvl(ROUND(sum(bal/hl.cnv_cny_exr),2),0) as je
+		from ETL_NSSB_HXKMYE ye,
+		(select hx.apbn
+		from
+		XTGL_JGYS hx,
+		<if test="sbbz==1">
+			(select nsrsbh, bmid, bmmc
+          from (select nsrsbh, bmid, bmmc, sbbz
+            
+                  from (select nsrsbh, m.bmid, m.bmmc, m.sbbz, m.sjbmid
+                     
+                          from XTGL_BM m
+                         start with m.BMID = #{bmid}
+                        connect by m.sjbmid = PRIOR m.BMID)
+                 where (sbbz = '2' or BMID = #{bmid})
+                   and nsrsbh is not null) f
+         where f.bmid not in
+               (
+               
+                select bm.bmid
+                  from xtgl_bm bm,
+                        (
+                       
+                         select nsrsbh, bmid, bmmc, sbbz
+                           from (
+         
+                                  select nsrsbh, m.bmid, m.bmmc, m.sbbz, m.sjbmid
+                                    from XTGL_BM m
+                                   start with m.BMID = #{bmid}
+                                  connect by m.sjbmid = PRIOR m.BMID)
+                          where sbbz = '1'
+                            and bmid != #{bmid}
+                            and nsrsbh is not null) t
+                 start with bm.bmid = t.bmid
+                connect by bm.sjbmid = PRIOR bm.BMID))yst
+		</if>
+		<if test="sbbz==0">
+			  (select nsrsbh, bmid, bmmc from 
+          xtgl_bm where 
+           bmid =#{bmid}
+            and nsrsbh is not null) yst		
+		</if>		
+		where hx.GPID = yst.bmid) jg,
+		(select CNV_CNY_EXR,ccy_cd,DW_DAT_DT from ZH_HLV) hl
+		where ye.DTL_ACT_ORG_ID = jg.apbn
+		and ye.DATA_DT = #{sjrq}
+		and hl.CCY_CD = ye.Ccy_Cd
+		and
+		to_char(hl.DW_DAT_DT, 'yyyy-mm-dd') = to_char(#{sjrq}, 'yyyy-mm-dd')
+		and trim(ye.ACT_ITM_ID) = #{km}
+	</select>
+	<!-- 分页查询 -->
+	<select id="queryKmyeByPage" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		SELECT rmbbal,hl,gpid,jgmc,RN,GL_ORG_ID,DTL_ACT_ORG_ID,ACT_ITM_ID,CCY_CD,BAL,DBT_AMT,CRD_AMT,to_char(PST_DT,'YYYY-MM-DD') as PST_DT,to_char(DATA_DT,'YYYY-MM-DD') as
+		DATA_DT
+		FROM
+		(SELECT a.*, ROWNUM rn
+		FROM (SELECT ROUND((km.bal / hl.cnv_cny_exr), 2) as rmbbal,hl.cnv_cny_exr as hl,jgys.gpid,jgys.jgmc,km.*
+		FROM
+		ETL_NSSB_HXKMYE km, XTGL_JGYS jgys,(select CNV_CNY_EXR, ccy_cd, DW_DAT_DT from ZH_HLV) hl
+		<where>
+			km.dtl_act_org_id = jgys.apbn
+			and jgys.yxbz='1'
+			and hl.CCY_CD = km.Ccy_Cd
+			and km.DATA_DT = hl.DW_DAT_DT
+			<if test=" ystjg !=null and ystjg !='' ">
+				and jgys.gpid = #{ystjg}   
+        	</if>
+			<if test=" glOrgId !=null and glOrgId !='' ">
+				and trim(GL_ORG_ID) = #{glOrgId}   
+        	</if>
+			<if test=" dtlActOrgId != null and dtlActOrgId != '' ">
+				AND trim(DTL_ACT_ORG_ID) = #{dtlActOrgId}     
+        	</if>
+			<if test=" actItmId != null and actItmId != '' ">
+				AND trim(ACT_ITM_ID) = #{actItmId}     
+        	</if>
+			<if test=" ccyCd != null and ccyCd != '' ">
+				AND trim(CCY_CD) = #{ccyCd}     
+        	</if>
+			<if test=" bal != null and bal != '' ">
+				AND trim(BAL) = #{bal}     
+        	</if>
+			<if test=" dbtAmt != null and dbtAmt != '' ">
+				AND trim(DBT_AMT) = #{dbtAmt}     
+        	</if>
+			<if test=" crdAmt != null and crdAmt != '' ">
+				AND trim(CRD_AMT) = #{crdAmt}     
+        	</if>
+			<if test=" dataDtStart != null and dataDtStart != '' ">
+				AND DATA_DT >= to_date(#{dataDtStart},'YYYY-MM-DD')   
+        	</if>
+			<if test=" dataDtEnd != null and dataDtEnd != '' ">
+				AND to_date(#{dataDtEnd},'YYYY-MM-DD') >= DATA_DT    
+        	</if>
+		</where>
+		<if test=" sortName !=null and sortName != '' ">
+			ORDER BY ${sortName}
+			<if test=" sortOrder =='asc' or sortOrder == 'desc' ">
+				${sortOrder}
+        	</if>
+		</if>
+		) a
+		WHERE
+		#{end} >= ROWNUM )
+		WHERE rn >= #{start}
+	</select>
+	<!-- 分页查询 -->
+	<select id="queryKmyeCount" resultType="int" parameterType="java.util.HashMap">
+		SELECT count(*) FROM ETL_NSSB_HXKMYE t, XTGL_JGYS jgys,(select CNV_CNY_EXR, ccy_cd, DW_DAT_DT from ZH_HLV) hl
+		<where>
+			t.dtl_act_org_id = jgys.apbn
+			and jgys.yxbz='1'
+			and hl.CCY_CD = t.Ccy_Cd
+			and t.DATA_DT = hl.DW_DAT_DT
+			<if test=" ystjg !=null and ystjg !='' ">
+				and jgys.gpid = #{ystjg}   
+        	</if>
+			<if test=" glOrgId !=null and glOrgId !='' ">
+				trim(t.GL_ORG_ID) = #{glOrgId}      
+        	</if>
+			<if test=" dtlActOrgId != null and dtlActOrgId != '' ">
+				AND trim(t.DTL_ACT_ORG_ID) = #{dtlActOrgId}     
+        	</if>
+			<if test=" actItmId != null and actItmId != '' ">
+				AND trim(t.ACT_ITM_ID) = #{actItmId}     
+        	</if>
+			<if test=" ccyCd != null and ccyCd != '' ">
+				AND t.CCY_CD = #{ccyCd}     
+        	</if>
+			<if test=" bal != null and bal != '' ">
+				AND t.BAL = #{bal}     
+        	</if>
+			<if test=" dbtAmt != null and dbtAmt != '' ">
+				AND t.DBT_AMT = #{dbtAmt}     
+        	</if>
+			<if test=" crdAmt != null and crdAmt != '' ">
+				AND t.CRD_AMT = #{crdAmt}     
+        	</if>
+
+			<if test=" dataDtStart != null and dataDtStart != '' ">
+				AND t.DATA_DT >= to_date(#{dataDtStart},'YYYY-MM-DD')   
+        	</if>
+			<if test=" dataDtEnd != null and dataDtEnd != '' ">
+				AND to_date(#{dataDtEnd},'YYYY-MM-DD') >= t.DATA_DT    
+        	</if>
+		</where>
+	</select>
+
+	<!-- 保存 -->
+	<insert id="addKmye" parameterType="com.aisino.nssb.core.hxkmye.model.hxkmye">
+		insert into ETL_NSSB_HXKMYE(
+		GL_ORG_ID,
+		DTL_ACT_ORG_ID,
+		ACT_ITM_ID,
+		CCY_CD,
+		BAL,
+		DBT_AMT,
+		CRD_AMT,
+		PST_DT,
+		DATA_DT
+		) VALUES(
+		#{glOrgId,jdbcType=VARCHAR},
+		#{dtlActOrgId,jdbcType=VARCHAR},
+		#{actItmId,jdbcType=VARCHAR},
+		#{ccyCd,jdbcType=VARCHAR},
+		#{bal,jdbcType=DECIMAL},
+		#{dbtAmt,jdbcType=DECIMAL},
+		#{crdAmt,jdbcType=DECIMAL},
+		to_date(#{pstDt,jdbcType=TIMESTAMP},'YYYY-MM-DD'),
+		to_date(#{dataDt,jdbcType=TIMESTAMP},'YYYY-MM-DD')
+		)
+	</insert>
+
+	<!-- 删除  -->
+	<delete id="deleteKmye" parameterType="java.util.HashMap">
+		delete from ETL_NSSB_HXKMYE where PST_DT = to_date(#{PST_DT},'YYYY-MM-DD')
+		and BAL = #{BAL}
+		and CRD_AMT = #{CRD_AMT}
+		and DTL_ACT_ORG_ID=#{DTL_ACT_ORG_ID}
+		and DBT_AMT = #{DBT_AMT}
+		and ACT_ITM_ID = #{ACT_ITM_ID}
+		and DATA_DT = to_date(#{DATA_DT},'YYYY-MM-DD')
+		and GL_ORG_ID =
+		#{GL_ORG_ID}
+		and CCY_CD = #{CCY_CD}
+    </delete>
+
+
+
+
+
+
+
+</mapper>
+

@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.afwt.dao.NssbAfwtDao" >
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.afwt.model.NssbAfwt" >
+    <result column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="APPLY_ID" property="applyId" jdbcType="VARCHAR" />
+    <result column="NSRSBH_ID" property="nsrsbhId" jdbcType="VARCHAR" />
+    <result column="NS_NAME" property="nsName" jdbcType="VARCHAR" />
+    <result column="SK_SDATE" property="skSdate" jdbcType="TIMESTAMP" />
+    <result column="SK_EDATE" property="skEdate" jdbcType="TIMESTAMP" />
+    <result column="NS_BANK" property="nsBank" jdbcType="VARCHAR" />
+    <result column="APPLY_STATE" property="applyState" jdbcType="VARCHAR" />
+    <result column="ADD_DATE" property="addDate" jdbcType="TIMESTAMP" />
+    <result column="UP_DATE" property="upDate" jdbcType="TIMESTAMP" />
+    <result column="AUDITOR" property="auditor" jdbcType="VARCHAR" />
+    <result column="AUDIT_BANK" property="auditBank" jdbcType="VARCHAR" />
+    <result column="READ_DATE" property="readDate" jdbcType="TIMESTAMP" />
+    <result column="AUDIT_DATE" property="auditDate" jdbcType="TIMESTAMP" />
+    <result column="AUDIT_IDEA" property="auditIdea" jdbcType="VARCHAR" />
+    <result column="ADUIT_END" property="aduitEnd" jdbcType="VARCHAR" />
+    <result column="ADDIT_STATE" property="additState" jdbcType="VARCHAR" />
+    <result column="APPLYNAME" property="applyName" jdbcType="VARCHAR" />
+    <result column="TAXDATEID" property="taxDateId" jdbcType="DECIMAL" />
+    <result column="QX_BMID" property="qxBmId" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.aisino.nssb.core.afwt.model.NssbAfwt" >
+    insert into NSSB_AFWT (ID, APPLY_ID, NSRSBH_ID, 
+      NS_NAME, SK_SDATE, SK_EDATE, 
+      NS_BANK, APPLY_STATE, ADD_DATE, 
+      UP_DATE, AUDITOR, AUDIT_BANK, 
+      READ_DATE, AUDIT_DATE, AUDIT_IDEA, 
+      ADUIT_END, ADDIT_STATE,APPLYNAME,TAXDATEID,QX_BMID)
+    values (#{id,jdbcType=VARCHAR}, #{applyId,jdbcType=VARCHAR}, #{nsrsbhId,jdbcType=VARCHAR}, 
+      #{nsName,jdbcType=VARCHAR}, #{skSdate,jdbcType=TIMESTAMP}, #{skEdate,jdbcType=TIMESTAMP}, 
+      #{nsBank,jdbcType=VARCHAR}, #{applyState,jdbcType=VARCHAR}, #{addDate,jdbcType=TIMESTAMP}, 
+      #{upDate,jdbcType=TIMESTAMP}, #{auditor,jdbcType=VARCHAR}, #{auditBank,jdbcType=VARCHAR}, 
+      #{readDate,jdbcType=TIMESTAMP}, #{auditDate,jdbcType=TIMESTAMP}, #{auditIdea,jdbcType=VARCHAR}, 
+      #{aduitEnd,jdbcType=VARCHAR}, #{additState,jdbcType=VARCHAR},#{applyName,jdbcType=VARCHAR},
+      #{taxDateId,jdbcType=DECIMAL}, #{qxBmId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.aisino.nssb.core.afwt.model.NssbAfwt" >
+     <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select SEQ_NSSB_AFWT.nextval from dual
+     </selectKey>
+    insert into NSSB_AFWT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="applyId != null" >
+        APPLY_ID,
+      </if>
+      <if test="nsrsbhId != null" >
+        NSRSBH_ID,
+      </if>
+      <if test="nsName != null" >
+        NS_NAME,
+      </if>
+      <if test="skSdate != null" >
+        SK_SDATE,
+      </if>
+      <if test="skEdate != null" >
+        SK_EDATE,
+      </if>
+      <if test="nsBank != null" >
+        NS_BANK,
+      </if>
+      <if test="applyState != null" >
+        APPLY_STATE,
+      </if>
+      <if test="addDate != null" >
+        ADD_DATE,
+      </if>
+      <if test="upDate != null" >
+        UP_DATE,
+      </if>
+      <if test="auditor != null" >
+        AUDITOR,
+      </if>
+      <if test="auditBank != null" >
+        AUDIT_BANK,
+      </if>
+      <if test="readDate != null" >
+        READ_DATE,
+      </if>
+      <if test="auditDate != null" >
+        AUDIT_DATE,
+      </if>
+      <if test="auditIdea != null" >
+        AUDIT_IDEA,
+      </if>
+      <if test="aduitEnd != null" >
+        ADUIT_END,
+      </if>
+      <if test="additState != null" >
+        ADDIT_STATE,
+      </if>
+      <if test="applyName !=null">
+      	APPLYNAME,      
+      </if>
+      <if test="taxDateId !=null">
+      	TAXDATEID,      
+      </if>
+      <if test="qxBmId !=null">
+      	QX_BMID,      
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="applyId != null" >
+        #{applyId,jdbcType=VARCHAR},
+      </if>
+      <if test="nsrsbhId != null" >
+        #{nsrsbhId,jdbcType=VARCHAR},
+      </if>
+      <if test="nsName != null" >
+        #{nsName,jdbcType=VARCHAR},
+      </if>
+      <if test="skSdate != null" >
+        to_date(#{skSdate},'YYYY-MM-DD'),
+      </if>
+      <if test="skEdate != null" >
+         to_date(#{skEdate},'YYYY-MM-DD'),
+      </if>
+      <if test="nsBank != null" >
+        #{nsBank,jdbcType=VARCHAR},
+      </if>
+      <if test="applyState != null" >
+        #{applyState,jdbcType=VARCHAR},
+      </if>
+      <if test="addDate != null" >
+        #{addDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="upDate != null" >
+        #{upDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditor != null" >
+        #{auditor,jdbcType=VARCHAR},
+      </if>
+      <if test="auditBank != null" >
+        #{auditBank,jdbcType=VARCHAR},
+      </if>
+      <if test="readDate != null" >
+         to_date(#{readDate},'YYYY-MM-DD'),
+      </if>
+      <if test="auditDate != null" >
+         to_date(#{readDate},'YYYY-MM-DD'),
+      </if>
+      <if test="auditIdea != null" >
+        #{auditIdea,jdbcType=VARCHAR},
+      </if>
+      <if test="aduitEnd != null" >
+        #{aduitEnd,jdbcType=VARCHAR},
+      </if>
+      <if test="additState != null" >
+        #{additState,jdbcType=VARCHAR},
+      </if>
+      
+      <if test="applyName !=null">
+      	#{applyName,jdbcType=VARCHAR},
+      
+      </if>
+      <if test="taxDateId !=null">
+      	#{taxDateId,jdbcType=DECIMAL},      
+      </if>
+       <if test="qxBmId !=null">
+      	#{qxBmId,jdbcType=VARCHAR},   
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="queryAfwtByPage" resultType="java.util.HashMap" parameterType="java.util.HashMap"> 
+  		SELECT RN,APPLY_ID,NSRSBH_ID,NS_NAME,NS_BANK,AUDITOR,AUDIT_BANK,APPLYNAME,APPLY_STATE
+  		,to_char(SK_SDATE,'YYYY-MM-DD') as SK_SDATE,to_char(SK_EDATE,'YYYY-MM-DD') as SK_EDATE,
+  		to_char(READ_DATE,'YYYY-MM-DD HH:mm:ss') as READ_DATE,to_char(AUDIT_DATE,'YYYY-MM-DD HH:mm:ss') as AUDIT_DATE,
+  		to_char(ADD_DATE,'YYYY-MM-DD') as ADD_DATE,
+  		ADDIT_STATE,TAXDATEID,QX_BMID,AUDIT_IDEA
+		FROM
+		(SELECT a.*, ROWNUM rn
+		FROM (SELECT *
+		FROM
+		NSSB_AFWT  
+		where
+		 		NS_BANK in  
+		 	
+			<foreach item="item" index="index" collection="list" open="("
+            separator="," close=")">
+            #{item}  
+         	</foreach>
+			
+			<if test="  applyId != null  and  applyId != ''" >
+       			and  APPLY_ID= #{applyId,jdbcType=VARCHAR}
+     		</if>
+      		<if test="nsrsbhId != null  and nsrsbhId != ''" >
+        		and NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="nsName != null and nsName !='' " >
+        		and  NS_NAME=#{nsName,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="skSdate != null and skSdate != '' " >
+        		and SK_SDATE = to_date(#{skSdate},'YYYY-MM-DD') 
+      		 </if>
+     		 <if test="skEdate != null and skEdate != '' " >
+       			and to_date(#{skEdate},'YYYY-MM-DD') = SK_EDATE
+      		</if>
+     		 
+        	
+      		
+      		<if test="auditBank != null and auditBank !=  '' " >
+       			and AUDIT_BANK= #{auditBank,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="applyDateBegin != ''  and applyDateEnd != '' and applyDateBegin != null  and applyDateEnd != null  " >
+        	   and	READ_DATE = between to_date(#{applyDateBegin},'YYYY-MM-DD') and to_date(#{applyDateEnd},'YYYY-MM-DD')
+      		</if>
+      		<if test="auditDateBegin != '' and auditDateEnd != ''  and auditDateBegin != null and auditDateEnd != null "   >
+        		and AUDIT_DATE=between to_date(#{auditDateBegin},'YYYY-MM-DD') and to_date(#{auditDateEnd},'YYYY-MM-DD')
+     		 </if> 
+      	
+     		 <if test="additState != null  and additState !=  ''"  >
+       		     and ADDIT_STATE= #{additState,jdbcType=VARCHAR}
+     		 </if>
+     		  <if test="applyName != null  and applyName !=  ''" >
+       		     and APPLYNAME= #{applyName,jdbcType=VARCHAR}
+     		 </if>
+		
+		
+		<if test=" sortName !=null and sortName != '' ">
+			ORDER BY ${sortName}
+			<if test=" sortOrder =='asc' or sortOrder == 'desc' ">
+				${sortOrder}
+        	</if>
+		</if>
+  		) a
+		WHERE
+		#{end} >= ROWNUM )
+		WHERE rn >= #{start}
+  </select>
+  
+  <select id="queryAfwtCount" resultType="int" parameterType="java.util.HashMap">
+  
+    select count(*)  from NSSB_AFWT
+  	where
+  			NS_BANK in 
+  			 
+			<foreach item="item" index="index" collection="list" open="("
+            separator="," close=")">
+            #{item}  
+         	</foreach>
+			
+			<if test="  applyId != null  and  applyId != ''" >
+       			and  APPLY_ID= #{applyId,jdbcType=VARCHAR}
+     		</if>
+      		<if test="nsrsbhId != null  and nsrsbhId != ''" >
+        		and NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="nsName != null and nsName !='' " >
+        		and  NS_NAME=#{nsName,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="skSdate != null and skSdate != '' " >
+        		and SK_SDATE = to_date(#{skSdate},'YYYY-MM-DD') 
+      		 </if>
+     		 <if test="skEdate != null and skEdate != '' " >
+       			and to_date(#{skEdate},'YYYY-MM-DD') = SK_EDATE
+      		</if>
+     		 <if test="nsBank != null and nsBank != '' " >
+        		and NS_BANK=#{nsBank,jdbcType=VARCHAR}
+      		</if>
+      		<if test="auditBank != null and auditBank !=  '' " >
+       			and AUDIT_BANK= #{auditBank,jdbcType=VARCHAR}
+      		</if>
+     		  <if test="applyDateBegin != ''  and applyDateEnd != '' and applyDateBegin != null  and applyDateEnd != null  " >
+        	   and	READ_DATE = between to_date(#{applyDateBegin},'YYYY-MM-DD') and to_date(#{applyDateEnd},'YYYY-MM-DD')
+      		</if>
+      		<if test="auditDateBegin != '' and auditDateEnd != ''  and auditDateBegin != null and auditDateEnd != null "   >
+        		and AUDIT_DATE=between to_date(#{auditDateBegin},'YYYY-MM-DD') and to_date(#{auditDateEnd},'YYYY-MM-DD')
+     		 </if> 
+      	
+     		 <if test="additState != null  and additState !=  ''" >
+       		     and ADDIT_STATE= #{additState,jdbcType=VARCHAR}
+     		 </if>
+     		 <if test="applyName != null  and applyName !=  ''" >
+       		     and APPLYNAME= #{applyName,jdbcType=VARCHAR}
+     		 </if>
+		
+		
+		
+  </select>
+  <select id="queryTaxDateIdCount" resultType="int" parameterType="com.aisino.nssb.core.afwt.model.NssbAfwt">
+  		 select count(*)  from NSSB_AFWT   
+  		 where NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}
+  </select>
+  <select id="queryAfwtBynsr"  resultType="com.aisino.nssb.core.afwt.model.NssbAfwt" parameterType="com.aisino.nssb.core.afwt.model.NssbAfwt">
+        select * from NSSB_AFWT   
+  		 where QX_BMID=#{qxBmId,jdbcType=VARCHAR}
+  		 and ADDIT_STATE  in (0,1,3)
+  
+  </select>
+  
+  <select id="selectAfwt"  resultType="com.aisino.nssb.core.afwt.model.NssbAfwt" parameterType="com.aisino.nssb.core.afwt.model.NssbAfwt">
+     
+     select APPLY_ID,APPLY_STATE  from  NSSB_AFWT
+     
+     where  NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}  and SK_SDATE = to_date(#{skSdate},'YYYY-MM-DD')
+  
+  
+  </select>
+  
+  <update id="updateAfwt"  parameterType="com.aisino.nssb.core.afwt.model.NssbAfwt">
+  	 update NSSB_AFWT
+  	 <set>
+  	 	    <if test="nsrsbhId != null" >
+        	      NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR},
+      		</if>
+     		 <if test="nsName != null" >
+        		  NS_NAME=#{nsName,jdbcType=VARCHAR},
+      		</if>
+      		<if test="applyName != null" >
+        		  APPLYNAME=#{applyName,jdbcType=VARCHAR},
+      		</if>
+     		 <if test="skSdate != null" >
+        		SK_SDATE= to_date(#{skSdate},'YYYY-MM-DD'),
+      		 </if>
+     		 <if test="skEdate != null" >
+       			 SK_EDATE=to_date(#{skEdate},'YYYY-MM-DD'),
+      		</if>
+     		<if test="upDate != null" >
+                  UP_DATE= #{upDate,jdbcType=TIMESTAMP},
+           </if>
+      		<if test="auditDate != null" >
+        		 AUDIT_DATE=to_date(#{auditDate},'yyyy-MM-dd HH24:mi:ss'),
+     		 </if>      	
+      		 <if test="auditor != null" >
+        		  AUDITOR=#{auditor,jdbcType=VARCHAR},
+      		</if>
+      		<if test="auditIdea != null" >
+        		  AUDIT_IDEA=#{auditIdea,jdbcType=VARCHAR},
+      		</if>
+     		 <if test="additState != null" >
+       		      ADDIT_STATE= #{additState,jdbcType=VARCHAR},
+       		 </if>
+       		 <if test="applyState != null" >
+       		      APPLY_STATE= #{applyState,jdbcType=VARCHAR},
+       		 </if>
+       		 <if test="auditBank !=null">
+       		       AUDIT_BANK= #{auditBank,jdbcType=VARCHAR},      		 
+       		 </if>
+  	 </set>
+  	 where  APPLY_ID =#{applyId,jdbcType=VARCHAR}
+   </update>
+   
+   <update id="upAfwtById"  parameterType="map" >
+   		update NSSB_AFWT  set  ADDIT_STATE=1, READ_DATE=sysdate
+   		where  APPLY_ID in 
+    <foreach item="applyId" index="index" collection="map.list" open="(" separator="," close=")">
+			#{applyId}
+	</foreach>
+   
+   
+   </update>
+   
+    <update id="auditAfwtById"  parameterType="map" >
+   		 <set>
+  	 	    <if test="nsrsbhId != null" >
+        	      NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR},
+      		</if>
+     		 <if test="nsName != null" >
+        		  NS_NAME=#{nsName,jdbcType=VARCHAR},
+      		</if>
+      		<if test="applyName != null" >
+        		  APPLYNAME=#{applyName,jdbcType=VARCHAR},
+      		</if>
+     		 <if test="skSdate != null" >
+        		SK_SDATE= to_date(#{skSdate},'YYYY-MM-DD'),
+      		 </if>
+     		 <if test="skEdate != null" >
+       			 SK_EDATE=to_date(#{skEdate},'YYYY-MM-DD'),
+      		</if>
+     		<if test="upDate != null" >
+                  UP_DATE= #{upDate,jdbcType=TIMESTAMP},
+           </if>
+      		<if test="auditDate != null" >
+        		 AUDIT_DATE=to_date(#{auditDate},'YYYY-MM-DD'),
+     		 </if>
+      	
+      		 <if test="auditor != null" >
+        			AUDITOR=#{auditor,jdbcType=VARCHAR},
+      		</if>
+     		 <if test="additState != null" >
+       		      ADDIT_STATE= #{additState,jdbcType=VARCHAR},
+       		 </if>
+  	 </set>
+  	
+   		where  APPLY_ID in 
+    <foreach item="applyId" index="index" collection="map.list" open="(" separator="," close=")">
+			#{applyId}
+	</foreach>
+   
+   
+   </update>
+   
+    <delete id="deleteAfwtById"  parameterType="map"  >
+    delete from NSSB_AFWT
+    where APPLY_ID in 
+    <foreach item="applyId" index="index" collection="map.list" open="(" separator="," close=")">
+			#{applyId}
+	</foreach>
+	</delete>
+	
+	 <select id="queryAuditByPage" resultType="java.util.HashMap" parameterType="java.util.HashMap"> 
+  		SELECT RN,APPLY_ID,NSRSBH_ID,NS_NAME,NS_BANK,AUDITOR,AUDIT_BANK,APPLYNAME,APPLY_STATE
+  		,to_char(SK_SDATE,'YYYY-MM-DD') as SK_SDATE,to_char(SK_EDATE,'YYYY-MM-DD') as SK_EDATE,
+  		to_char(READ_DATE,'YYYY-MM-DD HH:mm:ss') as READ_DATE,to_char(AUDIT_DATE,'YYYY-MM-DD HH:mm:ss') as AUDIT_DATE,
+  		to_char(ADD_DATE,'YYYY-MM-DD') as ADD_DATE,
+  		ADDIT_STATE,TAXDATEID,QX_BMID,AUDIT_IDEA
+		FROM
+		(SELECT a.*, ROWNUM rn
+		FROM (SELECT *
+		FROM
+		NSSB_AFWT  
+		where
+			NS_BANK in  		 	
+			<foreach item="item" index="index" collection="list" open="("
+            separator="," close=")">
+            #{item}  
+         	</foreach>
+			<if test="  applyId != null  and  applyId != ''" >
+       			 APPLY_ID= #{applyId,jdbcType=VARCHAR}
+     		</if>
+      		<if test="nsrsbhId != null  and nsrsbhId != ''" >
+        		and NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="nsName != null and nsName !='' " >
+        		and  NS_NAME=#{nsName,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="skSdate != null and skSdate != '' " >
+        		and SK_SDATE = to_date(#{skSdate},'YYYY-MM-DD') 
+      		 </if>
+     		 <if test="skEdate != null and skEdate != '' " >
+       			and to_date(#{skEdate},'YYYY-MM-DD') = SK_EDATE
+      		</if>
+      		<if test="auditBank != null and auditBank !=  '' " >
+       			and AUDIT_BANK= #{auditBank,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="applyDateBegin != ''  and applyDateEnd != '' and applyDateBegin != null  and applyDateEnd != null  " >
+        	   and	READ_DATE  between to_date(#{applyDateBegin},'YYYY-MM-DD') and to_date(#{applyDateEnd},'YYYY-MM-DD')
+      		</if>
+      		<if test="auditDateBegin != '' and auditDateEnd != ''  and auditDateBegin != null and auditDateEnd != null "   >
+        		and AUDIT_DATE between to_date(#{auditDateBegin},'YYYY-MM-DD') and to_date(#{auditDateEnd},'YYYY-MM-DD')
+     		 </if> 
+      	
+     		 <if test="additState != null  and additState !=  ''"  >
+       		     and ADDIT_STATE= #{additState,jdbcType=VARCHAR}
+     		 </if>
+     		  <if test="applyName != null  and applyName !=  ''" >
+       		     and APPLYNAME= #{applyName,jdbcType=VARCHAR}
+     		 </if>
+		
+		<if test=" sortName !=null and sortName != '' ">
+			ORDER BY ${sortName}
+			<if test=" sortOrder =='asc' or sortOrder == 'desc' ">
+				${sortOrder}
+        	</if>
+		</if>
+  		) a
+		WHERE
+		#{end} >= ROWNUM )
+		WHERE rn >= #{start}
+  </select>
+  <select id="queryAuditCount" resultType="int" parameterType="java.util.HashMap">
+  
+    select count(*)  from NSSB_AFWT
+  	where	
+  			NS_BANK in  	 	
+			<foreach item="item" index="index" collection="list" open="("
+            separator="," close=")">
+            #{item}  
+         	</foreach>
+			<if test="  applyId != null  and  applyId != ''" >
+       			 APPLY_ID= #{applyId,jdbcType=VARCHAR}
+     		</if>
+      		<if test="nsrsbhId != null  and nsrsbhId != ''" >
+        		and NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="nsName != null and nsName !='' " >
+        		and  NS_NAME=#{nsName,jdbcType=VARCHAR}
+      		</if>
+     		 <if test="skSdate != null and skSdate != '' " >
+        		and SK_SDATE = to_date(#{skSdate},'YYYY-MM-DD') 
+      		 </if>
+     		 <if test="skEdate != null and skEdate != '' " >
+       			and to_date(#{skEdate},'YYYY-MM-DD') = SK_EDATE
+      		</if>
+      		<if test="auditBank != null and auditBank !=  '' " >
+       			and AUDIT_BANK= #{auditBank,jdbcType=VARCHAR}
+      		</if>
+     		  <if test="applyDateBegin != ''  and applyDateEnd != '' and applyDateBegin != null  and applyDateEnd != null  " >
+        	   and	READ_DATE  between to_date(#{applyDateBegin},'YYYY-MM-DD') and to_date(#{applyDateEnd},'YYYY-MM-DD')
+      		</if>
+      		<if test="auditDateBegin != '' and auditDateEnd != ''  and auditDateBegin != null and auditDateEnd != null "   >
+        		and AUDIT_DATE  between to_date(#{auditDateBegin},'YYYY-MM-DD') and to_date(#{auditDateEnd},'YYYY-MM-DD')
+     		 </if> 
+      	
+     		 <if test="additState != null  and additState !=  ''" >
+       		     and ADDIT_STATE= #{additState,jdbcType=VARCHAR}
+     		 </if>
+     		 <if test="applyName != null  and applyName !=  ''" >
+       		     and APPLYNAME= #{applyName,jdbcType=VARCHAR}
+     		 </if>
+	
+  </select>
+  <select id="queryTaxdBy" resultType="java.lang.String"  parameterType="com.aisino.nssb.core.afwt.model.NssbAfwt">
+  	 select TAXDATEID from NSSB_AFWT  where  QX_BMID=#{qxBmId,jdbcType=VARCHAR}  
+  	 and  #{skSdate_end}  >= to_char(sk_sdate,'YYYY-MM-DD')
+  	 and to_char(sk_sdate,'YYYY') >#{skEdate}
+  </select>
+</mapper>

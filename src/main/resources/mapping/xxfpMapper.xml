@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aisino.nssb.core.xxfp.dao.xxfpDao">
+	<sql id="getJg">
+		--机构查询
+		<if test='sbbz=="1"'>
+			(select nsrsbh, bmid, bmmc
+			from
+			(select nsrsbh, bmid, bmmc, sbbz
+			--子节点中标志为空的并且税号不为空的
+			from
+			(select nsrsbh, m.bmid, m.bmmc, m.sbbz, m.sjbmid
+			--自己和所有子节点
+			from XTGL_BM m
+			start with m.BMID = #{ystjg}
+			connect by m.sjbmid = PRIOR m.BMID)
+			where (sbbz = '2' or
+			BMID = #{ystjg})
+			and nsrsbh is not null) f
+			where f.bmid not in
+			(
+			--找出这类子节点以及分子节点
+			select bm.bmid
+			from xtgl_bm
+			bm,
+			(
+			--子节点中标志为汇总的并且税号不为空的
+			select
+			nsrsbh, bmid, bmmc, sbbz
+			from (
+			--自己和所有子节点
+			select nsrsbh, m.bmid, m.bmmc, m.sbbz,
+			m.sjbmid
+			from XTGL_BM m
+			start with m.BMID =
+			#{ystjg}
+			connect by m.sjbmid = PRIOR
+			m.BMID)
+			where sbbz = '1'
+			and bmid != #{ystjg}
+			and nsrsbh is not null) t
+			start with
+			bm.bmid = t.bmid
+			connect by bm.sjbmid =
+			PRIOR bm.BMID)) s
+		</if>
+		<if test='sbbz=="0"'>
+			(select nsrsbh, bmid, bmmc
+			from
+			xtgl_bm where
+			bmid = #{ystjg}
+			and nsrsbh is not null) s
+		</if>
+	</sql>
+	<!-- 获得机构信息 -->
+	<select id="getJgxx" resultType="java.util.HashMap" parameterType="java.lang.String">
+		select * from xtgl_bm where BMID=#{jg}
+	</select>
+	<select id="getXxfp" resultType="java.util.HashMap" parameterType="com.aisino.nssb.core.bean.XxfpBean">
+		--销项发票
+		select bm.ssflbm,bm.ssflmc,nvl(data.je,0) je,nvl(data.se,0) se from
+		NSSB_SSFL_BM bm left join (
+		select sum(je) je,sum(se) se,ssflbm,ssflmc
+		from (
+		select
+		d.je,
+		d.se,
+		t.fpzl,
+		ssflbm.ssflbm,
+		ssflbm.ssflmc,
+		t.kprq,
+		t.xfsh,
+		s.bmid,
+		s.bmmc
+		from KPGL_XXFP t,
+		KPGL_XXFP_MX d,
+		NSSB_SSFL_YS ssfl,
+		NSSB_SSFL_BM ssflbm,
+		<include refid="getJg" />
+		where
+		t.fpdm = d.fpdm
+		and
+		t.fphm = d.fphm
+		and
+		ssfl.SPMC = d.spmc
+		<if test=' fplb != null and fplb != "" and fplb=="0" '>
+			and d.je > 0	
+		</if>
+		<if test=' fplb != null and fplb != "" and fplb=="1" '>
+			and 0> d.je 	
+		</if>
+		and t.kprq between
+		to_date(#{begindate}, 'yyyy-mm-dd') and
+		to_date(#{enddate},
+		'yyyy-mm-dd')
+		and t.XFSH = s.nsrsbh
+		and ssfl.ssflbm = ssflbm.ssflbm
+		<if test=' fpzl != null and fpzl != "" '>
+			and t.fpzl = #{fpzl}	
+		</if>
+		union all
+		select
+		d.je,
+		d.se,
+		t.fpzl,
+		ssflbm.ssflbm,
+		ssflbm.ssflmc,
+		t.kprq,
+		t.xfsh,
+		s.bmid,
+		s.bmmc
+		from KPGL_XXFP t,
+		KPGL_XXFP_QD d,
+		NSSB_SSFL_YS ssfl,
+		NSSB_SSFL_BM ssflbm,
+		<include refid="getJg" />
+		where
+		t.fpdm = d.fpdm
+		and
+		t.fphm = d.fphm
+		and
+		ssfl.SPMC = d.spmc
+		<if test=' fplb != null and fplb != "" and fplb=="0" '>
+			and d.je > 0	
+		</if>
+		<if test=' fplb != null and fplb != "" and fplb=="1" '>
+			and 0> d.je 	
+		</if>
+		and t.kprq between
+		to_date(#{begindate}, 'yyyy-mm-dd') and
+		to_date(#{enddate},
+		'yyyy-mm-dd')
+		and t.XFSH = s.nsrsbh
+		and ssfl.ssflbm = ssflbm.ssflbm
+		<if test=' fpzl != null and fpzl != "" '>
+			and t.fpzl = #{fpzl}	
+		</if>
+		) group by ssflbm,ssflmc
+		)data on bm.ssflbm = data.ssflbm order by bm.ssflbm
+	</select>
+	<select id="getHeader" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		select SSHY,NSRMC,FRMC,ZCDZ,SCJYDZ,KHYHZH,DJZCLX,DHHM from XTGL_XFXX where nsrsbh =
+		#{nsrsbh}
+	</select>
+</mapper>

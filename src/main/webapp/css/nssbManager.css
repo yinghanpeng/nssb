@@ -1,0 +1,92 @@
+*{
+	margin : 0px;
+	padding: 0px;
+}
+
+
+.has-feedback .form-control {
+	padding-right: 5px !important;
+}
+
+html {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	height: 100%;
+	width: 100%;
+	font-family:monospace,monospace;
+    font-family:arial,Tahoma,"Microsoft YaHei";
+}
+
+.modal-body {
+	overflow: auto;
+}
+
+#cellModal_tz #cellModal_sb {
+	height: 100%;
+	width: 100%;
+}
+
+
+
+.tdBorder {
+	border : 0.1pt  solid;
+	 background-color:red; 
+}
+
+.modal-content {
+	height: 100%;
+}
+
+.tz-modal-body {
+	height: 80%;
+	overflow: hidden;
+}
+
+.bb-modal-body {
+	height: 80%;
+	overflow: hidden;
+}
+
+#queryModal, #editModal, #exportModal{
+	width: 100%;
+	height: 100%;
+}
+
+#add-modal-dialog, #edit-modal-dialog, #export-modal-dialog{
+	width: 90%;
+	height: 90%;
+}
+
+.second-modal-dialog-body{
+	overflow:auto !important;
+}
+
+#cellModal, #cellModal_sb, #cellModal_export{
+	width: 100%;
+	height: 100%;
+}
+
+#editTZCell_modal_dialog, #editSBCell_modal_dialog, #exportCell_modal_dialog{
+	width: 90%;
+	height: 90%;
+}
+
+.third-modal-dialog-body{
+	width: 100%;
+	overflow:hidden;
+}
+
+#nano .nanobar .bar {
+    background: #38f;
+    border-radius: 4px;
+    box-shadow: 0 0 10px #59d;
+    height: 6px;
+}
+
+.h-disabled {
+	pointer-events:none; 
+}
+

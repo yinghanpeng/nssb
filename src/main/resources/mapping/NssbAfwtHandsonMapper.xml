@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aisino.nssb.core.afwthd.dao.NssbAfwtHandsonDao" >
+  <resultMap id="BaseResultMap" type="com.aisino.nssb.core.afwthd.model.NssbAfwtHandson" >
+   
+    <result column="APPLY_ID" property="applyId" jdbcType="VARCHAR" />
+    <result column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="AFWT_HTML" property="afwtHtml" jdbcType="CLOB" 
+			javaType = "java.lang.String"  typeHandler ="com.aisino.nssb.utils.OracleClobTypeHandler"/>
+    <result column="AFWT_HANDSON" property="afwtHandson" jdbcType="CLOB" 
+			javaType = "java.lang.String"  typeHandler ="com.aisino.nssb.utils.OracleClobTypeHandler"/>
+     <result column="AFWT_HTML_NAME" property="afwtHtmlName" jdbcType="VARCHAR" />
+     <result column="ACCEPT_ID" jdbcType="VARCHAR" property="acceptId" />
+    <result column="ACCEPT_NAME" jdbcType="VARCHAR" property="acceptName" />
+    <result column="ACCEPT_DATE" jdbcType="TIMESTAMP" property="acceptDate" />
+    <result column="TZ_NSSB" jdbcType="VARCHAR" property="tzNssb" />
+    <result column="MODEL_ID" jdbcType="VARCHAR" property="modelId" />
+  </resultMap>
+  <insert id="insertAfwths" parameterType="com.aisino.nssb.core.afwthd.model.NssbAfwtHandson" >
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select SEQ_NSSB_AFWT_HAND.nextval from dual
+     </selectKey>
+    insert into NSSB_AFWT_HANDSON (APPLY_ID, ID,AFWT_HTML,AFWT_HANDSON,AFWT_HTML_NAME,
+      ACCEPT_ID, ACCEPT_NAME, ACCEPT_DATE,TZ_NSSB ,MODEL_ID)
+    values ( #{applyId,jdbcType=VARCHAR}, #{id,jdbcType=VARCHAR},#{afwtHtml,jdbcType=CLOB},
+    #{afwtHandson,jdbcType=CLOB},#{afwtHtmlName,jdbcType=VARCHAR},
+    #{acceptId,jdbcType=VARCHAR}, #{acceptName,jdbcType=VARCHAR}, 
+    #{acceptDate,jdbcType=TIMESTAMP}, #{tzNssb,jdbcType=VARCHAR},
+    #{modelId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.aisino.nssb.core.afwthd.model.NssbAfwtHandson" >
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+            select SEQ_NSSB_AFWT_HAND.nextval from dual
+     </selectKey>
+    insert into NSSB_AFWT_HANDSON
+    <trim prefix="(" suffix=")" suffixOverrides="," >     
+        ID,
+      <if test="applyId != null" >
+        APPLY_ID,
+      </if>        
+       <if test="afwtHtml != null" >
+        AFWT_HTML,
+      </if>
+      <if test="afwtHandson != null" >
+        AFWT_HANDSON,
+      </if>
+      <if test="afwtHtmlName != null" >
+        AFWT_HTML_NAME,
+      </if>
+       <if test="acceptId != null">
+        ACCEPT_ID,
+      </if>
+      <if test="acceptName != null">
+        ACCEPT_NAME,
+      </if>
+      <if test="acceptDate != null">
+        ACCEPT_DATE,
+      </if>
+       <if test="tzNssb != null">
+        TZ_NSSB,
+      </if>
+       <if test="modelId != null">
+        MODEL_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{id,jdbcType=VARCHAR},
+      <if test="applyId != null" >
+        #{applyId,jdbcType=VARCHAR},
+      </if>
+      <if test="afwtHtml != null" >
+        #{afwtHtml,jdbcType=CLOB},
+      </if>
+      <if test="afwtHandson != null" >
+        #{afwtHandson,jdbcType=CLOB},
+      </if>
+      <if test="afwtHtmlName != null" >
+        #{afwtHtmlName,jdbcType=VARCHAR},
+      </if>
+      <if test="acceptId != null">
+        #{acceptId,jdbcType=VARCHAR},
+      </if>
+      <if test="acceptName != null">
+        #{acceptName,jdbcType=VARCHAR},
+      </if>
+      <if test="acceptDate != null">
+        #{acceptDate,jdbcType=TIMESTAMP},
+      </if>
+       <if test="tzNssb != null">
+        #{tzNssb,jdbcType=VARCHAR},
+      </if>
+       <if test="modelId != null">
+       #{modelId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+    <delete id="deleteAfwthsById"  parameterType="map"  >
+    delete from NSSB_AFWT_HANDSON
+    where APPLY_ID in 
+    <foreach item="applyId" index="index" collection="map.list" open="(" separator="," close=")">
+			#{applyId}
+	</foreach>
+	</delete>	
+	<select id="selectByApplyId"  resultType="com.aisino.nssb.core.afwthd.model.NssbAfwtHandson"  parameterType="java.lang.String" >
+	   select * from  NSSB_AFWT_HANDSON
+	   where  APPLY_ID=#{applyId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectListByApplyId"  resultMap="BaseResultMap"  parameterType="java.util.HashMap" >
+	 select
+	   NAH.APPLY_ID as applyId,
+	   NAH.MODEL_ID   as tableId,
+	   NAH.AFWT_HANDSON as afwtHandson,
+	   NAH.AFWT_HTML_NAME as afwtHtmlName,			
+	   NAH.ACCEPT_ID as  acceptId		
+	   from  NSSB_AFWT_HANDSON  NAH  join  NSSB_AFWT NA  on  NAH.APPLY_ID=NA.APPLY_ID
+	  <where>
+	   		<if test="applyId !=null">
+	   			NAH.APPLY_ID=#{applyId,jdbcType=VARCHAR}
+	   		</if>	            
+	         <if test="afwtHtmlName !=null">
+	         	and NAH.AFWT_HTML_NAME=#{afwtHtmlName,jdbcType=VARCHAR}
+	         </if>
+	         <if test="modelId !=null">
+	         	 and NAH.MODEL_ID=#{modelId,jdbcType=VARCHAR}
+	         </if>
+	         <if test="tzNssb !=null">
+	             and  NAH.TZ_NSSB=#{tzNssb,jdbcType=VARCHAR}
+	         </if>
+	         <if test="taxDateId !=null and taxDateId !=0">
+  				and NA.TAXDATEID=#{taxDateId,jdbcType=DECIMAL}
+  			</if>
+  			<if test="nsrsbhId !=null">
+  			    and NA.NSRSBH_ID=#{nsrsbhId,jdbcType=VARCHAR}
+  			</if>
+  			
+	     </where>  
+	     ORDER BY NA.SK_SDATE ASC  
+	</select>
+	
+	<select id="queryHandsonByIds"   resultType="java.lang.String">
+	    select HANDSONID  from NSSB_AFWT_HANDSON
+		 WHERE APPLY_ID in 
+    <foreach collection="list" item="applyId" open="(" close=")"
+    separator=",">
+    #{applyId}
+    </foreach>
+	</select>
+	<update id="delAfwtByApplyId" parameterType="com.aisino.nssb.core.afwthd.model.NssbAfwtHandson">
+	  update  NSSB_AFWT_HANDSON
+      <set>
+           <if test="afwtHtml !=null">
+           		  AFWT_HTML=#{afwtHtml,jdbcType=VARCHAR},
+           </if>
+          <if test="afwtHandson !=null">
+            	 AFWT_HANDSON=#{afwtHandson,jdbcType=VARCHAR},                      
+          </if>
+          <if test="acceptId != null">
+                   ACCEPT_ID= #{acceptId,jdbcType=VARCHAR},
+         </if>
+          <if test="acceptName != null">
+                ACCEPT_NAME=  #{acceptName,jdbcType=VARCHAR},
+         </if>
+         <if test="acceptDate != null">
+       			ACCEPT_DATE= #{acceptDate,jdbcType=TIMESTAMP},
+         </if>      
+      </set>      
+          where APPLY_ID=#{applyId,jdbcType=VARCHAR} 
+          <if test="afwtHtmlName !=null">
+          	  and AFWT_HTML_NAME=#{afwtHtmlName,jdbcType=VARCHAR}
+          </if>
+          <if test="modelId !=null">
+              and  MODEL_ID=#{modelId,jdbcType=VARCHAR}
+          </if>
+        
+	</update>
+	<insert id="insertList" parameterType="java.util.List">
+	  insert  into NSSB_AFWT_HANDSON(ID,APPLY_ID, AFWT_HANDSON,AFWT_HTML_NAME)
+	  select SEQ_NSSB_AFWT_HAND.nextval,cd.*from(
+	 <foreach collection="list" index="" item="nssbAfwtHandson"
+		 separator="union all">
+ 	select
+       #{nssbAfwtHandson.applyId,jdbcType=VARCHAR},
+       #{nssbAfwtHandson.afwtHandson,jdbcType=CLOB},       
+       #{nssbAfwtHandson.afwtHtmlName,jdbcType=VARCHAR},
+       #{nssbAfwtHandson.acceptId,jdbcType=VARCHAR},
+       #{nssbAfwtHandson.tzNssb,jdbcType=VARCHAR},
+       #{nssbAfwtHandson.modelId,jdbcType=VARCHAR}
+	from dual
+
+ 	</foreach>
+ 	)cd
+	</insert>
+	
+	<select id="queryAfwtHdByPage" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+	SELECT RN,APPLY_ID ,
+   AFWT_HTML_NAME ,
+   ACCEPT_ID ,ACCEPT_NAME,to_char(ACCEPT_DATE,'YYYY-MM-DD HH:mm:ss') as  ACCEPT_DATE,
+  TZ_NSSB,MODEL_ID,one_menus,two_menus
+    FROM
+    (SELECT a.*, ROWNUM rn
+    FROM (SELECT nah.apply_id,nah.afwt_html_name,nah.accept_id,
+    nah.accept_name,nah.accept_date,nah.tz_nssb,nah.model_id,
+    mm.one_menus,mm.two_menus 
+    FROM
+    NSSB_AFWT_HANDSON nah left join (select tm.one_menus,tm.two_menus ,tm.model_id from  handson_table_model tm  where   tm.model='1')mm
+   on  nah.MODEL_ID=mm.model_id 
+  
+		<where>
+				<if test=" applyId !=null and applyId !='' ">
+				  	nah.APPLY_ID = #{applyId}      
+        		</if>
+        		<if test="tzNssb !=null and tzNssb !=''">
+        		 and nah.TZ_NSSB=#{tzNssb}
+        		</if>
+		
+		</where>
+		 order by nah.MODEL_ID asc
+  		) a
+		WHERE
+		#{end} >= ROWNUM )
+		WHERE rn >= #{start}
+ 	</select>
+ 	
+ 	<select id="queryAfwtHdCount" resultType="int" parameterType="java.util.HashMap">
+	 SELECT count(*) from
+		NSSB_AFWT_HANDSON  
+		<where>
+				<if test=" applyId !=null and applyId !='' ">
+				  	APPLY_ID = #{applyId}      
+        		</if>
+        		<if test="tzNssb !=null and tzNssb !=''">
+        		 and TZ_NSSB=#{tzNssb}
+        		</if>
+         order by MODEL_ID asc				
+		</where>		
+ 	</select>
+ 	
+ 	
+ 	<select id="selectStateByApplyId"   resultType="java.lang.String"  parameterType="java.lang.String" >
+ 	  select ACCEPT_ID from NSSB_AFWT_HANDSON
+ 	  where APPLY_ID=#{applyId,jdbcType=VARCHAR}  
+  	</select>
+</mapper>

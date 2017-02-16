@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:security="http://www.springframework.org/schema/security" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+ http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+ http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+ http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+ http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+ http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+ http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+	<aop:aspectj-autoproxy />
+	<context:component-scan base-package="com.aisino">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- 引入jdbc配置文件 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+		<!-- 系统-D参数覆盖 -->
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+
+
+	<!--创建jdbc数据源 -->
+	<bean id="writeDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver.w}" />
+		<property name="url" value="${jdbc.url.w}" />
+		<property name="username" value="${jdbc.username.w}" />
+		<property name="password" value="${jdbc.password.w}" />
+		<!-- 初始化连接数 -->
+		<property name="initialSize" value="10"></property>
+		<!-- 最大活动连接数 -->
+		<property name="maxActive" value="50"></property>
+		<!-- 最大空闲连接 -->
+		<property name="maxIdle" value="40"></property>
+		<!-- 最小空闲连接 -->
+		<property name="minIdle" value="10"></property>
+		<!-- 从池中获取连接最大等待时间 -->
+		<property name="maxWait" value="3000"></property>
+		<!-- 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除. -->
+		<property name="testWhileIdle" value="true"></property>
+		<!-- 借出连接时不要测试 -->
+		<property name="testOnBorrow" value="false"></property>
+		<!-- 每30秒运行一次空闲连接回收器 -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000"></property>
+		<!-- 池中的连接空闲1分钟后被回收 -->
+		<property name="minEvictableIdleTimeMillis" value="60000"></property>
+		<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量 -->
+		<property name="numTestsPerEvictionRun" value="3"></property>
+		<!-- 连接泄漏回收参数，当可用连接数少于3个时才执行 -->
+		<property name="removeAbandoned" value="true"></property>
+		<!-- 连接泄漏回收参数，180秒，泄露的连接可以被删除的超时值 -->
+		<property name="removeAbandonedTimeout" value="180"></property>
+	</bean>
+
+	<bean id="readDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver.r}" />
+		<property name="url" value="${jdbc.url.r}" />
+		<property name="username" value="${jdbc.username.r}" />
+		<property name="password" value="${jdbc.password.r}" />
+		<!-- 初始化连接数 -->
+		<property name="initialSize" value="10"></property>
+		<!-- 最大活动连接数 -->
+		<property name="maxActive" value="50"></property>
+		<!-- 最大空闲连接 -->
+		<property name="maxIdle" value="40"></property>
+		<!-- 最小空闲连接 -->
+		<property name="minIdle" value="10"></property>
+		<!-- 从池中获取连接最大等待时间 -->
+		<property name="maxWait" value="3000"></property>
+		<!-- 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除. -->
+		<property name="testWhileIdle" value="true"></property>
+		<!-- 借出连接时不要测试 -->
+		<property name="testOnBorrow" value="false"></property>
+		<!-- 每30秒运行一次空闲连接回收器 -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000"></property>
+		<!-- 池中的连接空闲1分钟后被回收 -->
+		<property name="minEvictableIdleTimeMillis" value="60000"></property>
+		<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量 -->
+		<property name="numTestsPerEvictionRun" value="3"></property>
+		<!-- 连接泄漏回收参数，当可用连接数少于3个时才执行 -->
+		<property name="removeAbandoned" value="true"></property>
+		<!-- 连接泄漏回收参数，180秒，泄露的连接可以被删除的超时值 -->
+		<property name="removeAbandonedTimeout" value="180"></property>
+	</bean>
+
+	<!-- 主从配置清单 -->
+	<bean id="dynamicDataSource" class="com.aisino.nssb.spring.DynamicDataSource">
+		<property name="write" ref="writeDataSource" />
+		<property name="read">
+			<list>
+				<ref bean="readDataSource" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 创建SqlSessionFactory，同时指定数据源 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" p:dataSource-ref="dynamicDataSource" p:mapperLocations="classpath:mapping/*.xml" />
+
+	<!-- Mapper接口所在包名，Spring会自动查找其下的Mapper -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" p:basePackage="com.aisino.nssb.core.*.dao" p:sqlSessionFactoryBeanName="sqlSessionFactory" />
+
+	<!--
+		(事务管理)transaction manager, use JtaTransactionManager for global tx
+	-->
+	<bean id="transactionManager" class="com.aisino.nssb.spring.DynamicDataSourceTransactionManager">
+		<property name="dataSource" ref="dynamicDataSource" />
+	</bean>
+
+	<!-- 事务管理传播配置:add、modify、delete开头默认开启事务 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 写库 -->
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="modify*" propagation="REQUIRED" />
+			<tx:method name="proc*" propagation="REQUIRED" />
+			<!-- 读库 -->
+			<tx:method name="judge*" read-only="true" />
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="query*" read-only="true" />
+			<tx:method name="check*" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- 数据库事务切面定义 -->
+	<aop:config>
+		<aop:pointcut id="dbPointCut" expression="execution(* com.aisino.nssb.core..service.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="dbPointCut" order="2" />
+	</aop:config>
+
+	<!-- 系统日志切面定义 -->
+	<bean id="serviceLogger" class="com.aisino.nssb.core.aspect.ServiceLogger">
+	</bean>
+	<aop:config>
+		<aop:aspect id="TestAspect" ref="serviceLogger">
+			<!--配置com.aisino.nssb.core..service包下所有类或接口的所有方法-->
+			<aop:pointcut id="businessService" expression="execution(* com.aisino.nssb.core.controller..*.*(..))" />
+			<aop:before pointcut-ref="businessService" method="doBefore" />
+			<aop:after pointcut-ref="businessService" method="doAfter" />
+			<aop:around pointcut-ref="businessService" method="doAround" />
+			<aop:after-returning pointcut-ref="businessService" method="afterReturn" returning="returnVal" />
+			<aop:after-throwing pointcut-ref="businessService" method="doThrowing" throwing="ex" />
+		</aop:aspect>
+	</aop:config>
+
+	<!-- 下面为定时任务配置 -->
+	<!--
+		<bean id="jobBean" class="com.aisino.nssb.core.job.UserSynJob" /> <bean id="jobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> <property name="targetObject" ref="jobBean" /> <property name="targetMethod"
+		value="execute" /> 将并发设置为false <property name="concurrent" value="false" /> </bean> <bean id="trigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean"> <property name="jobDetail" ref="jobDetail" />
+	--><!--表达式，我的是每 30 执行一次-->
+	<!--<property name="cronExpression" value="59 59 23 * * ?" />
+	</bean>
+
+	--><!--  总管理类如果将lazy-init='false'那么容器启动就会执行调度程序   -->
+	<!--
+		<bean id="startQuertz" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" lazy-init="false"> <property name="triggers"> <list>
+		作业调度器,list下可加入其他的调度器 <ref bean="trigger" /> </list> </property> </bean>
+	-->
+</beans>
