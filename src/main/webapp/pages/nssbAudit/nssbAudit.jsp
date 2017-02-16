@@ -616,8 +616,6 @@
 			</div>
 			<!-- /.modal -->
 			</div>
-			
-		</div>
 	</body>
 <script type="text/javascript">
 	//全局审核人

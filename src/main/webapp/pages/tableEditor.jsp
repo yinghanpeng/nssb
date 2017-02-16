@@ -7,31 +7,38 @@
 %>
 <!DOCTYPE html>
 <html>
-	<head>
+<head>
 
-		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-		<title>纳税申报-报表模板编辑器</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>纳税申报-报表模板编辑器</title>
 
-		<meta http-equiv="pragma" content="no-cache">
-		<meta http-equiv="cache-control" content="no-cache">
-		<meta http-equiv="expires" content="0">
-		<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-		<meta http-equiv="description" content="This is my page">
-		<!-- jquery -->
-		<script type="text/javascript" src="<%=path%>/resources/jquery.min.js"></script>
-		<!-- zTree -->
-		<script type="text/javascript" src="<%=path%>/resources/jquery-zTree/js/jquery.ztree.all-3.5.js"></script>
-		<link rel="stylesheet" href="<%=path%>/resources/jquery-zTree/css/zTreeStyle.css" type="text/css">
-		<!-- layer -->
-		<script type="text/javascript" src="<%=path%>/resources/layer/layer.js"></script>
-		<!-- bootstrap -->
-		<script type="text/javascript" src="<%=path%>/resources/bootstrap-3.3.6/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="<%=path%>/resources/bootstrap-3.3.6/css/bootstrap.min.css">
-		<!-- handsontable -->
-		<script type="text/javascript" src="<%=path%>/resources/handsontable/js/handsontable.full.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="<%=path%>/resources/handsontable/css/handsontable.full.min.css">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="This is my page">
+<!-- jquery -->
+<script type="text/javascript" src="<%=path%>/resources/jquery.min.js"></script>
+<!-- zTree -->
+<script type="text/javascript"
+	src="<%=path%>/resources/jquery-zTree/js/jquery.ztree.all-3.5.js"></script>
+<link rel="stylesheet"
+	href="<%=path%>/resources/jquery-zTree/css/zTreeStyle.css"
+	type="text/css">
+<!-- layer -->
+<script type="text/javascript" src="<%=path%>/resources/layer/layer.js"></script>
+<!-- bootstrap -->
+<script type="text/javascript"
+	src="<%=path%>/resources/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/resources/bootstrap-3.3.6/css/bootstrap.min.css">
+<!-- handsontable -->
+<script type="text/javascript"
+	src="<%=path%>/resources/handsontable/js/handsontable.full.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/resources/handsontable/css/handsontable.full.min.css">
 
-		<style type="text/css">
+<style type="text/css">
 * {
 	margin: 0px;
 	padding: 0px;
@@ -53,7 +60,7 @@ body {
 }
 
 .iMiddle {
-	padding-left:20px;
+	padding-left: 20px;
 	width: 100%;
 	height: 93%;
 	float: left;
@@ -85,83 +92,60 @@ body {
 	right: -300px;
 }
 </style>
-	</head>
-	<body>
-		<div class="iContainer">
-			<div class="iMiddle">
-				<!--
-			<iframe src="tableContext.html" frameborder="0" id="tableInfo"></iframe>
-			-->
-				<!-- <p>
-					<button name="save" id="save" class="btn btn-primary">
-						save
-					</button>
-					<button name="load" id="load" class="btn btn-primary">
-						load
-					</button>
-					<button name="load" id="clear" class="btn btn-primary">
-						clear
-					</button>
-					<span class="text-info">请输入表名</span>
-					<input type="text" id="table_name">
-					<span class="text-info">tableID</span>
-					<input type="text" id="table_id">
-					<span class="text-info">状态</span>
-					<input type="text" id="tzNssb">
-				</p> -->
-				
-				
+</head>
+<body>
+	<div class="iContainer">
+		<div class="iMiddle">
 			<form class="form-horizontal" role="form">
-			  <div class="form-group col-xs-6">
-			    <label for="inputEmail3" class="col-sm-2 control-label">表名</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" id="table_name">
-			    </div>
-			  </div>
-			  <div class="form-group col-xs-6">
-			    <label for="inputPassword3" class="col-sm-2 control-label">tableID</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" id="table_id">
-			    </div>
-			  </div>
-			  <div class="form-group col-xs-6">
-			    <label for="inputPassword3" class="col-sm-2 control-label">状态</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" id="tzNssb">
-			    </div>
-			  </div>
-			  <div class="form-group col-xs-6">
-			    <label for="inputPassword3" class="col-sm-2 control-label">一级项目</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" id="oneMenus" name="oneMenus">
-			    </div>
-			  </div>
-			  <div class="form-group col-xs-6">
-			    <label for="inputPassword3" class="col-sm-2 control-label">二级项目</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" id="twoMenus" name="twoMenus">
-			    </div>
-			  </div>
-			  
-				<div class="text-right" style="padding-right:75px;padding-bottom:8px;">
-				  	<button type="button" class="btn btn-success" id="save">save</button>
-				  	<button type="button" class="btn btn-primary" id="load">load</button>
-				  	<button type="button" class="btn btn-warning" id="clear">clear</button>
-			    </div>
-			  
+				<div class="form-group col-xs-6">
+					<label for="inputEmail3" class="col-sm-2 control-label">表名</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="table_name">
+					</div>
+				</div>
+				<div class="form-group col-xs-6">
+					<label for="inputPassword3" class="col-sm-2 control-label">tableID</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="table_id">
+					</div>
+				</div>
+				<div class="form-group col-xs-6">
+					<label for="inputPassword3" class="col-sm-2 control-label">状态</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="tzNssb">
+					</div>
+				</div>
+				<div class="form-group col-xs-6">
+					<label for="inputPassword3" class="col-sm-2 control-label">一级项目</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="oneMenus"
+							name="oneMenus">
+					</div>
+				</div>
+				<div class="form-group col-xs-6">
+					<label for="inputPassword3" class="col-sm-2 control-label">二级项目</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="twoMenus"
+							name="twoMenus">
+					</div>
+				</div>
+				<div class="text-right"
+					style="padding-right: 75px; padding-bottom: 8px;">
+					<button type="button" class="btn btn-success" id="save">save</button>
+					<button type="button" class="btn btn-primary" id="load">load</button>
+					<button type="button" class="btn btn-warning" id="clear">clear</button>
+				</div>
 			</form>
-
 			<table id="table"></table>
-
-			</div>
-			<div class="iLeft">
-				<ul id="treeDemo" class="ztree">
-				</ul>
-			<div>
-
 		</div>
-	</body>
-	<script type="text/javascript">
+		<div class="iLeft">
+			<ul id="treeDemo" class="ztree">
+			</ul>
+			<div></div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
 	var hot,tree,treeid;
 	//hot:表格对象,tree:树节点对象,setting加载树时参数设置,treeid:树节点id
 
@@ -373,28 +357,34 @@ body {
             }
 		};
 		$.ajax({
-				url : "<%=path%>/interface/LoadModelName.do",
-				type : "post",	
-				data : {"sortName": "", "sortOrder": "asc", "pageSize": 50, "pageNumber": 1},			
-				dataType : "json",
-				success : function(data) {
-						//var arr = JSON.parse(data);
-						console.log(data);
-						var ob = new Array();
-						$.each(data.rows, function(idx, obj) {
-							var bo = new Object();
-							console.log("=================================");
-							console.log(bo);
-							bo['id'] = obj.MODEL_ID;
-							bo['name'] = obj.MODEL_NAME;
-							bo['tzNssb'] = obj.TZ_NSSB;
-							bo['oneMenus'] = obj.ONE_MENUS;
-							bo['twoMenus'] = obj.TWO_MENUS;
-							ob.push(bo);
-						});
-					zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, ob);
-				}
-			});	
+				url : "<%=path%>
+	/interface/LoadModelName.do",
+			type : "post",
+			data : {
+				"sortName" : "",
+				"sortOrder" : "asc",
+				"pageSize" : 50,
+				"pageNumber" : 1
+			},
+			dataType : "json",
+			success : function(data) {
+				//var arr = JSON.parse(data);
+				console.log(data);
+				var ob = new Array();
+				$.each(data.rows, function(idx, obj) {
+					var bo = new Object();
+					console.log("=================================");
+					console.log(bo);
+					bo['id'] = obj.MODEL_ID;
+					bo['name'] = obj.MODEL_NAME;
+					bo['tzNssb'] = obj.TZ_NSSB;
+					bo['oneMenus'] = obj.ONE_MENUS;
+					bo['twoMenus'] = obj.TWO_MENUS;
+					ob.push(bo);
+				});
+				zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, ob);
+			}
 		});
-	</script>
+	});
+</script>
 </html>

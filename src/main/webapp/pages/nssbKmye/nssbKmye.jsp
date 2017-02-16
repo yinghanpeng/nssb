@@ -144,7 +144,7 @@
 			</div>
 			<table id="kmye_table"></table>
 		</div>
-		<div class="modal fade" id="kmye_modal" name="kmye_modal" tabindex="-1" role="dialog" aria-labelledby="kmye_ModallTitle" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+		<div class="modal fade" id="kmye_modal"  tabindex="-1" role="dialog" aria-labelledby="kmye_ModallTitle" aria-hidden="true" data-keyboard="false" data-backdrop="static">
 			<div class="modal-dialog" style="width: 600px;">
 				<div class="modal-content">
 					<div class="modal-header">

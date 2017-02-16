@@ -30,7 +30,7 @@ public class OracleClobTypeHandler implements TypeHandler<Object> {
 	}
 
 	public void setParameter(PreparedStatement arg0, int arg1, Object arg2, JdbcType arg3) throws SQLException {
-		CLOB clob = CLOB.empty_lob();
+		CLOB clob = CLOB.getEmptyCLOB();
 		clob.setString(1, (String) arg2);
 		arg0.setClob(arg1, clob);
 	}
